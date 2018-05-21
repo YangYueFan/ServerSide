@@ -75,7 +75,7 @@ open class Account{
             self.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             
         }else{
-            self.returnData(response: response, status: -1, message: "账号密码有误", jsonDic: jsonDic)
+            self.returnData(response: response, status: -1, message: message, jsonDic: jsonDic)
         }  
     }
     

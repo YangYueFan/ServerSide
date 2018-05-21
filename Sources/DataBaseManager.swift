@@ -11,7 +11,7 @@ import PerfectMySQL
 //MARK: 数据库信息
 let mysql_host = "0.0.0.0"
 let mysql_user = "root"
-let mysql_password = "123123"
+let mysql_password = "1350280yyF"
 let mysql_database = "MyAppSQL"
 
 let table_account   = "UserInfo"
@@ -33,12 +33,12 @@ open class DataBaseManager {
     //MARK: 开启连接
     private func connectedDataBase() -> Bool {
         let connected = mysql.connect(host: mysql_host, user: mysql_user, password: "", db: mysql_database)
-        
+        mysql.setOption(.MYSQL_SET_CHARSET_NAME, "utf8")
         guard connected else {
             print("MySQL连接失败" + mysql.errorMessage())
             return false
         }
-//        print("MySQL连接成功")
+        print("MySQL连接成功")
         return true
     }
     

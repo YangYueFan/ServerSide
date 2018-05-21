@@ -1,5 +1,6 @@
 // Generated automatically by Perfect Assistant Application
-// Date: 2017-09-20 19:30:47 +0000
+// Date: 2018-05-18
+
 import PackageDescription
 let package = Package(
 	name: "PerfectTemplate",
