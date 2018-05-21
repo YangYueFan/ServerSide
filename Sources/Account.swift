@@ -56,6 +56,7 @@ open class Account{
         let result = DataBaseManager().custom(sqlStr: "Call userLogin('\(userAccount)','\(userPassword)','\(uuid)','\(formatter.string(from: Date()))')")
         
         result.mysqlResult?.forEachRow(callback: { (data) in
+            print(data)
             if data.count > 1 {
                 jsonDic["Phone"]   = data[0]
                 jsonDic["UserID"]    = data[1]
