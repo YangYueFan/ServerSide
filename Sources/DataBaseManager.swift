@@ -32,8 +32,10 @@ open class DataBaseManager {
     
     //MARK: 开启连接
     private func connectedDataBase() -> Bool {
-        let connected = mysql.connect(host: mysql_host, user: mysql_user, password: "", db: mysql_database)
+        let connected = mysql.connect(host: mysql_host, user: mysql_user, password: mysql_password, db: mysql_database)
+        
         mysql.setOption(.MYSQL_SET_CHARSET_NAME, "utf8")
+        
         guard connected else {
             print("MySQL连接失败" + mysql.errorMessage())
             return false
@@ -63,7 +65,7 @@ open class DataBaseManager {
             return (false, nil, msg)
         }
         let msg = "SQL成功: \(sql)"
-//        print(msg)
+        print(msg)
         return (true, mysql.storeResults(), msg) //sql执行成功
     }
     
