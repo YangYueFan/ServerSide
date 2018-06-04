@@ -115,10 +115,21 @@ open class NetworkServerManager {
             let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "IMG_Files").path)
             // 用我们的根目录和路径
             // 修改集触发请求的句柄
-            print(Dir(Dir.workingDir.path + "file/HTML").path)
+            
             handler.handleRequest(request: request, response: response)
         }
+        //*********************************************************************
         routes.add(method: .get, uri: "/file/**") { (request, response) in
+            // 获得符合通配符的请求路径
+            request.path = request.urlVariables[routeTrailingWildcardKey]!
+            print(Dir(Dir.workingDir.path + "file/HTML").path)
+            // 用文档根目录初始化静态文件句柄
+            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "file/HTML").path)
+            // 用我们的根目录和路径
+            // 修改集触发请求的句柄
+            handler.handleRequest(request: request, response: response)
+        }
+        routes.add(method: .post, uri: "/file/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             print(Dir(Dir.workingDir.path + "file/HTML").path)
