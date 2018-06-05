@@ -81,37 +81,37 @@ open class Account{
     }
     
     
-    // 获取验证码
-    static func handle_User_GetCode (request : HTTPRequest ,response : HTTPResponse){
-        //标配
-        var status = 1
-        var message = "成功"
-        var jsonDic = [String:Any]()
-        response.setHeader( .contentType, value: "text/html")          //响应头
-        
-        //获取登录信息
-        guard let _ = request.param(name: "userAccount") else {
-            status = -1
-            message = "请输入手机号码"
-            jsonDic = [String:Any]()
-            Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
-            return
-        }
-         
-        print(request.uri + "\n" + request.params().description)
-        
-      
-        if jsonDic.count != 0 {
-            
-            self.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
-            
-        }else{
-            self.returnData(response: response, status: -1, message: "账号密码有误", jsonDic: jsonDic)
-        }
-        
-        
-        
-    }
+//    // 获取验证码
+//    static func handle_User_GetCode (request : HTTPRequest ,response : HTTPResponse){
+//        //标配
+//        var status = 1
+//        var message = "成功"
+//        var jsonDic = [String:Any]()
+//        response.setHeader( .contentType, value: "text/html")          //响应头
+//
+//        //获取登录信息
+//        guard let _ = request.param(name: "userAccount") else {
+//            status = -1
+//            message = "请输入手机号码"
+//            jsonDic = [String:Any]()
+//            Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
+//            return
+//        }
+//
+//        print(request.uri + "\n" + request.params().description)
+//
+//
+//        if jsonDic.count != 0 {
+//
+//            self.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
+//
+//        }else{
+//            self.returnData(response: response, status: -1, message: "账号密码有误", jsonDic: jsonDic)
+//        }
+//
+//
+//
+//    }
     
     //处理User注册
     static func handle_User_Register (request : HTTPRequest ,response : HTTPResponse){
@@ -162,20 +162,15 @@ open class Account{
  
         print(request.uri + "\n" + request.params().description)
 
-        let result = DataBaseManager().selectAllDataBaseSQLwhere(tableName: Account.table_account, keyValue: "Account = \(userAccount) and Password = \(userPassword1)")
-        
+        let result = DataBaseManager().custom(sqlStr: "Call resgisterUser('\(userAccount)','\(userPassword1)')")
+        var returnValue = 0
         result.mysqlResult?.forEachRow(callback: { (data) in
-            jsonDic["UserID"]   = data[0]
-            jsonDic["Phone"]    = data[1]
-            jsonDic["Name"]     = data[3]
-            jsonDic["Age"]      = data[4]
-            jsonDic["Email"]    = data[5]
-            jsonDic["Class"]    = data[6]
+            returnValue = Int(data[0]!)!
         })
-        if jsonDic.count != 0 {
-            self.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
+        if returnValue != 0 {
+            self.returnData(response: response, status: status, message: "注册成功" , jsonDic: jsonDic)
         }else{
-            self.returnData(response: response, status: -1, message: "账号密码有误", jsonDic: jsonDic)
+            self.returnData(response: response, status: -1, message: "该账号已存在", jsonDic: jsonDic)
         }
         
         

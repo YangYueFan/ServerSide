@@ -58,14 +58,14 @@ open class NetworkServerManager {
         
         
         //*********************************************************************
-        // 获取验证码get
-        routes.add(method: .get, uri: "/userGetCode") { (request, response) in
-            Account.handle_User_GetCode(request: request, response: response)
-        }
-        // 获取验证码post
-        routes.add(method: .post, uri: "/userGetCode") { (request, response) in
-            Account.handle_User_GetCode(request: request, response: response)
-        }
+//        // 获取验证码get
+//        routes.add(method: .get, uri: "/userGetCode") { (request, response) in
+//            Account.handle_User_GetCode(request: request, response: response)
+//        }
+//        // 获取验证码post
+//        routes.add(method: .post, uri: "/userGetCode") { (request, response) in
+//            Account.handle_User_GetCode(request: request, response: response)
+//        }
         
         
         
