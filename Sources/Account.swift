@@ -17,7 +17,7 @@ open class Account{
     
     static let table_account = "UserInfo"
     
-    //处理User登录
+    // 处理User登录
     static func handle_User_Login (request : HTTPRequest ,response : HTTPResponse){
         //标配
         var status = 1
@@ -42,9 +42,6 @@ open class Account{
         }
         print(request.uri + "\n" + request.params().description)
         
-        
-//        let result = DataBaseManager().selectAllDataBaseSQLwhere(tableName: Account.table_account, keyValue: "Account = \(userAccount) and Password = \(userPassword)")
-//
         let formatter = DateFormatter()
         formatter.timeZone = TimeZone.current
         formatter.locale = Locale.init(identifier: "zh_CN")
@@ -58,15 +55,15 @@ open class Account{
         result.mysqlResult?.forEachRow(callback: { (data) in
             print(data)
             if data.count > 1 {
-                jsonDic["Phone"]   = data[0]
-                jsonDic["UserID"]    = data[1]
-                jsonDic["Name"]    = data[2]
-                jsonDic["imgUrl"]     = data[3]
-                jsonDic["ClassType"]      = data[4]
-//                jsonDic["Email"]    = data[5]
-                jsonDic["Sex"]    = data[5]
-                jsonDic["Age"]   = data[6]
-                jsonDic["apiToken"]   = data[7]
+                jsonDic["Phone"]        = data[0]
+                jsonDic["UserID"]       = data[1]
+                jsonDic["Name"]         = data[2]
+                jsonDic["imgUrl"]       = data[3]
+                jsonDic["ClassType"]    = data[4]
+                jsonDic["Sex"]          = data[5]
+                jsonDic["Age"]          = data[6]
+                jsonDic["apiToken"]     = data[7]
+                jsonDic["isLogined"]    = data[8]
             }else{
                 message = data[0]!
             }
@@ -80,40 +77,8 @@ open class Account{
         }  
     }
     
-    
-//    // 获取验证码
-//    static func handle_User_GetCode (request : HTTPRequest ,response : HTTPResponse){
-//        //标配
-//        var status = 1
-//        var message = "成功"
-//        var jsonDic = [String:Any]()
-//        response.setHeader( .contentType, value: "text/html")          //响应头
-//
-//        //获取登录信息
-//        guard let _ = request.param(name: "userAccount") else {
-//            status = -1
-//            message = "请输入手机号码"
-//            jsonDic = [String:Any]()
-//            Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
-//            return
-//        }
-//
-//        print(request.uri + "\n" + request.params().description)
-//
-//
-//        if jsonDic.count != 0 {
-//
-//            self.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
-//
-//        }else{
-//            self.returnData(response: response, status: -1, message: "账号密码有误", jsonDic: jsonDic)
-//        }
-//
-//
-//
-//    }
-    
-    //处理User注册
+
+    // 处理User注册
     static func handle_User_Register (request : HTTPRequest ,response : HTTPResponse){
         //标配
         var status = 1
@@ -177,6 +142,8 @@ open class Account{
         
     }
     
+    
+    // 处理上传头像
     static func handle_User_UploadIcon (request : HTTPRequest ,response : HTTPResponse){
         
         guard let userAccount = request.param(name: "userAccount") else {
@@ -235,6 +202,7 @@ open class Account{
         }
     }
     
+    
     // 获取首页数据
     static func handle_Get_Items (request : HTTPRequest ,response : HTTPResponse){
         var jsonDic = [String:Any]()
@@ -275,7 +243,13 @@ open class Account{
     }
     
     
-    
+    /// 处理数据返回
+    ///
+    /// - Parameters:
+    ///   - response: response
+    ///   - status: 状态码
+    ///   - message: 信息
+    ///   - jsonDic: 返回数据
     class func returnData(response:HTTPResponse ,status:Int ,message:String ,jsonDic:Any!) {
         do{
             try response.setBody(json: NetworkServerManager.baseResponseBodyJSON(status: status, message: message, data: jsonDic)).setHeader(.contentType, value: "application/json")
@@ -285,8 +259,14 @@ open class Account{
         }
     }
     
+
     
-    //检查token与账户是否对应
+    /// 检查token与账户是否对应
+    ///
+    /// - Parameters:
+    ///   - account: 账号
+    ///   - token: token
+    /// - Returns: 返回数据
     class func checkToken(account:String ,token:String) -> Bool {
         let result = DataBaseManager().selectAllDataBaseSQLwhere(tableName: table_Token, keyValue: "Account = " + account + " AND Token = '" + token + "'")
         return result.mysqlResult?.numRows() != nil ? ((result.mysqlResult?.numRows()) != nil) : false

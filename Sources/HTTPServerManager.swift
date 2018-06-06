@@ -16,6 +16,7 @@ open class NetworkServerManager {
         
         server = HTTPServer.init()                          //创建HTTPServer服务器
         var routes = Routes.init(baseUri: "/api")           //创建路由器
+        UserRoutes.configure(routes: &routes)
         configure(routes: &routes)                          //注册路由
         server.addRoutes(routes)                            //路由添加进服务
         server.serverPort = port                            //端口
@@ -45,53 +46,6 @@ open class NetworkServerManager {
 
         // 添加接口,请求方式,路径
 
-        //*********************************************************************
-        // 登录get
-        routes.add(method: .get , uri: "/userLogin") { (request, response) in
-            Account.handle_User_Login(request: request, response: response)
-        }
-        // 登录post
-        routes.add(method: .post , uri: "/userLogin") { (request, response) in
-            Account.handle_User_Login(request: request, response: response)
-        }
-        
-        
-        
-        //*********************************************************************
-//        // 获取验证码get
-//        routes.add(method: .get, uri: "/userGetCode") { (request, response) in
-//            Account.handle_User_GetCode(request: request, response: response)
-//        }
-//        // 获取验证码post
-//        routes.add(method: .post, uri: "/userGetCode") { (request, response) in
-//            Account.handle_User_GetCode(request: request, response: response)
-//        }
-        
-        
-        
-        
-        //*********************************************************************
-        // 注册get
-        routes.add(method: .get, uri: "/userRegister") { (request, response) in
-            Account.handle_User_Register(request: request, response: response)
-        }
-        // 注册post
-        routes.add(method: .post, uri: "/userRegister") { (request, response) in
-            Account.handle_User_Register(request: request, response: response)
-        }
-        
-        
-        
-        
-        //*********************************************************************
-        // 上传头像post
-        routes.add(method: .post, uri: "/uploadIcon") { (request, response) in
-            Account.handle_User_UploadIcon(request: request, response: response)
-        }
-        
-
-        
-        
         //*********************************************************************
         //所有"/res"开头的URL都映射到了物理路径  
         routes.add(method: .get, uri: "/res/**") { (request, response) in
@@ -149,7 +103,6 @@ open class NetworkServerManager {
         routes.add(method: .get, uri: "/getHomeData") { (request, response) in
             Account.handle_Get_Items(request: request, response: response)
         }
-        
     }
     
     //MARK: 通用响应格式
