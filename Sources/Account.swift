@@ -90,21 +90,18 @@ open class Account{
         guard let userAccount = request.param(name: "userAccount") else {
             status = -1
             message = "请输入正确手机号码"
-            jsonDic = [String:Any]()
             Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             return
         }
         guard let userPassword1 = request.param(name: "userPassword1") else {
             status = -1
             message = "请输入密码"
-            jsonDic = [String:Any]()
             Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             return
         }
         guard let userPassword2 = request.param(name: "userPassword2") else {
             status = -1
             message = "请输入确认密码"
-            jsonDic = [String:Any]()
             Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             return
         }
@@ -112,7 +109,6 @@ open class Account{
         guard userPassword1 == userPassword2 else{
             status = -1
             message = "两次密码不一致"
-            jsonDic = [String:Any]()
             Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             return
         }
@@ -120,7 +116,6 @@ open class Account{
         guard let _ = request.param(name: "code") else {
             status = -1
             message = "请输入验证码"
-            jsonDic = [String:Any]()
             Account.returnData(response: response, status: status, message: message, jsonDic: jsonDic)
             return
         }
@@ -158,50 +153,79 @@ open class Account{
             self.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
             return
         }
-        
-        
-        // 通过操作fileUploads数组来掌握文件上传的情况
-        // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
-        
-        if let uploads = request.postFileUploads, uploads.count > 0 {
-            
-            // 创建路径用于存储已上传文件
-            let fileDir = Dir(Dir.workingDir.path + "IMG_Files")
-            do {
-                try fileDir.create()
-            } catch {
-                print(error)
-            }
-            
-            var ary = [[String:Any]]()
-            for upload in uploads{
-                ary.append([
-                    "fieldName": upload.fieldName,  //字段名
-                    "contentType": upload.contentType, //文件内容类型
-                    "fileName": upload.fileName,    //文件名       app要加上.png
-                    "fileSize": upload.fileSize,    //文件尺寸
-                    "tmpFileName": upload.tmpFileName   //上载后的临时文件名
-                    ])
-                
-                // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
-                let thisFile = File(upload.tmpFileName)
-                do {
-                    let file = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
-                    let _ = DataBaseManager().updateDatabaseSQL(tableName: table_account, keyValue: "imgUrl = '/res/\(upload.fileName)'" , whereKey: "Account", whereValue: (userAccount))
-                    if file.path.count > 0 {
-                        Account.returnData(response: response, status: 1, message: "上传成功", jsonDic:["imgUrl":"/res/" + upload.fileName])
-                    }else{
-                        Account.returnData(response: response, status: -1, message: "上传失败", jsonDic:[String:String]())
-                    }
-                    
-  
-                } catch {
-                    print(error)
-                }
-            }
+        let imgUrl = self.saveIconImage(request: request, userAccount: userAccount)
+        if imgUrl != "" {
+            self.returnData(response: response, status: 0, message: "上传成功" , jsonDic: ["imgUrl" : imgUrl])
+        }else{
+            self.returnData(response: response, status: -1, message: "上传失败" , jsonDic: nil)
         }
+        
     }
     
+    // 用户完善信息
+    static func handle_User_CompleteInfo(request : HTTPRequest, response : HTTPResponse ) {
+        //标配
+        response.setHeader( .contentType, value: "text/html")          //响应头
+    
+        var jsonDic = [String:Any]()
+        
+        guard let apiToken = request.param(name: "apiToken") else {
+            self.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return
+        }
+        guard let userAccount = request.param(name: "userAccount") else {
+            self.returnData(response: response, status: -1, message: "缺少 userAccount", jsonDic: nil)
+            return
+        }
+        guard let name = request.param(name: "name") else {
+            self.returnData(response: response, status: -1, message: "缺少 name", jsonDic: nil)
+            return
+        }
+        guard let age = request.param(name: "age") else {
+            self.returnData(response: response, status: -1, message: "缺少 age", jsonDic: nil)
+            return
+        }
+        guard let sex = request.param(name: "sex") else {
+            self.returnData(response: response, status: -1, message: "缺少 sex", jsonDic: nil)
+            return
+        }
+        if Account.checkToken(account: userAccount, token: apiToken) == false{
+            self.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            return
+        }
+        
+        let result = DataBaseManager().custom(sqlStr: "Call completeInfo('\(userAccount)','\(name)','\(sex)','\(age)')")
+        var returnValue = 0
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            returnValue = Int(data[0]!)!
+        })
+        let _ = self.saveIconImage(request: request, userAccount: userAccount)
+        if returnValue != 0 {
+            let result = DataBaseManager().custom(sqlStr: "Call getUserInfo('\(userAccount)')")
+            
+            result.mysqlResult?.forEachRow(callback: { (data) in
+                print(data)
+                if data.count > 1 {
+                    jsonDic["Age"]          = data[0]
+                    jsonDic["UserID"]       = data[1]
+                    jsonDic["Name"]         = data[2]
+                    jsonDic["imgUrl"]       = data[3]
+                    jsonDic["ClassType"]    = data[4]
+                    jsonDic["Sex"]          = data[5]
+                    jsonDic["Age"]          = data[6]
+                    jsonDic["apiToken"]     = data[7]
+                    jsonDic["isLogined"]    = data[8]
+                }
+            })
+
+            self.returnData(response: response, status: 0, message: "提交成功", jsonDic: jsonDic)
+            
+        }else{
+            self.returnData(response: response, status: -1, message: "提交失败", jsonDic: nil)
+        }
+        
+        
+    }
     
     // 获取首页数据
     static func handle_Get_Items (request : HTTPRequest ,response : HTTPResponse){
@@ -243,6 +267,8 @@ open class Account{
     }
     
     
+    
+    
     /// 处理数据返回
     ///
     /// - Parameters:
@@ -272,7 +298,55 @@ open class Account{
         return result.mysqlResult?.numRows() != nil ? ((result.mysqlResult?.numRows()) != nil) : false
     }
     
-
+    
+    
+    /// 保存头像
+    ///
+    /// - Parameters:
+    ///   - request:
+    ///   - userAccount: 用户名
+    /// - Returns: 图片路径 或 ""
+    class func saveIconImage(request:HTTPRequest, userAccount : String ) -> String {
+        // 通过操作fileUploads数组来掌握文件上传的情况
+        // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
+        
+        if let uploads = request.postFileUploads, uploads.count > 0 {
+            
+            // 创建路径用于存储已上传文件
+            let fileDir = Dir(Dir.workingDir.path + "IMG_Files")
+            do {
+                try fileDir.create()
+            } catch {
+                print(error)
+            }
+            
+//            var ary = [[String:Any]]()
+            for upload in uploads{
+//                ary.append([
+//                    "fieldName": upload.fieldName,  //字段名
+//                    "contentType": upload.contentType, //文件内容类型
+//                    "fileName": upload.fileName,    //文件名       app要加上.png
+//                    "fileSize": upload.fileSize,    //文件尺寸
+//                    "tmpFileName": upload.tmpFileName   //上载后的临时文件名
+//                    ])
+                
+                // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
+                let thisFile = File(upload.tmpFileName)
+                do {
+                    let file = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
+                    let _ = DataBaseManager().updateDatabaseSQL(tableName: Account.table_account, keyValue: "imgUrl = '/res/\(upload.fileName)'" , whereKey: "Account", whereValue: (userAccount))
+                    if file.path.count > 0 {
+                        return "/res/" + upload.fileName
+                    }else{
+                        return ""
+                    }
+                } catch {
+                    print(error)
+                }
+            }
+        }
+        return ""
+    }
     
     
 }

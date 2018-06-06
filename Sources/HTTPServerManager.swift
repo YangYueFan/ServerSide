@@ -16,7 +16,7 @@ open class NetworkServerManager {
         
         server = HTTPServer.init()                          //创建HTTPServer服务器
         var routes = Routes.init(baseUri: "/api")           //创建路由器
-        UserRoutes.configure(routes: &routes)
+        UserRoutes.configure(routes: &routes)               //注册用户信息接口路由
         configure(routes: &routes)                          //注册路由
         server.addRoutes(routes)                            //路由添加进服务
         server.serverPort = port                            //端口
@@ -96,7 +96,6 @@ open class NetworkServerManager {
         
         
         //*********************************************************************
-        
         routes.add(method: .post, uri: "/getHomeData") { (request, response) in
             Account.handle_Get_Items(request: request, response: response)
         }

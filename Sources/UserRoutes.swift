@@ -37,6 +37,17 @@ public class UserRoutes {
         }
         
         //*********************************************************************
+        // 用户完善信息
+        routes.add(method: .get, uri: "/userCompleteInfo") { (request, response) in
+            Account.handle_User_CompleteInfo(request: request, response: response)
+        }
+        routes.add(method: .post, uri: "/userCompleteInfo") { (request, response) in
+            Account.handle_User_CompleteInfo(request: request, response: response)
+        }
+        
+        
+        
+        //*********************************************************************
         // 上传头像post
         routes.add(method: .post, uri: "/uploadIcon") { (request, response) in
             Account.handle_User_UploadIcon(request: request, response: response)
