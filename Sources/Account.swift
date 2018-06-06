@@ -83,7 +83,7 @@ open class Account{
         //标配
         var status = 1
         var message = "成功"
-        var jsonDic = [String:Any]()
+        let jsonDic = [String:Any]()
         response.setHeader( .contentType, value: "text/html")          //响应头
         
         //获取登录信息
