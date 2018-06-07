@@ -320,19 +320,23 @@ open class Account{
                 print(error)
             }
             
-//            var ary = [[String:Any]]()
             for upload in uploads{
-//                ary.append([
-//                    "fieldName": upload.fieldName,  //字段名
-//                    "contentType": upload.contentType, //文件内容类型
-//                    "fileName": upload.fileName,    //文件名       app要加上.png
-//                    "fileSize": upload.fileSize,    //文件尺寸
-//                    "tmpFileName": upload.tmpFileName   //上载后的临时文件名
-//                    ])
                 
-                // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
                 let thisFile = File(upload.tmpFileName)
                 do {
+                    // 查询旧头像并删除
+                    let result = DataBaseManager().selectKeyDataBaseSQLwhere(tableName: Account.table_account, whereKeyValue: "Account = '\(userAccount)'", selectKey: "imgUrl")
+                    
+                    result.mysqlResult?.forEachRow(callback: { (element) in
+                        let oldUrl = element[0]! as String
+                        if oldUrl.count > 0 {
+                            let oldFileName = oldUrl.substring(from: String.Index.init(encodedOffset: 5))
+                            let oldFile = File.init(fileDir.path + oldFileName)
+                            oldFile.delete()
+                        }
+                    })
+                    
+                    // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
                     let file = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
                     let _ = DataBaseManager().updateDatabaseSQL(tableName: Account.table_account, keyValue: "imgUrl = '/res/\(upload.fileName)'" , whereKey: "Account", whereValue: (userAccount))
                     if file.path.count > 0 {

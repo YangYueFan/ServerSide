@@ -132,6 +132,15 @@ open class DataBaseManager {
         let SQL = "SELECT * FROM \(tableName) WHERE \(keyValue)"
         return mysqlStatement(SQL)
     }
+    /// 查
+    ///
+    /// - Parameters:
+    /// - tableName: 表
+    /// - keyValue: 键值对
+    func selectKeyDataBaseSQLwhere(tableName: String, whereKeyValue: String ,selectKey: String) -> (success: Bool, mysqlResult: MySQL.Results?, errorMsg: String) {
+        let SQL = "SELECT \(selectKey) FROM \(tableName) WHERE \(whereKeyValue)"
+        return mysqlStatement(SQL)
+    }
     
     /// 查tableName所有字段名
     ///
