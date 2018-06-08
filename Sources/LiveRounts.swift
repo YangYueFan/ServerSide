@@ -124,9 +124,9 @@ public class LiveRounts {
         if type == "1" {
             let result = DataBaseManager().custom(sqlStr: "Call issueHeart('\(userID)','\(content)','\("")','\("")','\("")')")
             if result.success {
-                Account.returnData(response: response, status: -1, message: "上传失败", jsonDic: nil)
-            }else{
                 Account.returnData(response: response, status: 1, message: "上传成功", jsonDic: nil)
+            }else{
+                Account.returnData(response: response, status: -1, message: "上传失败", jsonDic: nil)
             }
         }else if type == "2"{
             //保存图片、视频资源
@@ -137,9 +137,9 @@ public class LiveRounts {
             }else{
                 let result = DataBaseManager().custom(sqlStr: "Call issueHeart('\(userID)','\(content)','\(path)','\("")','\("")')")
                 if result.success {
-                    Account.returnData(response: response, status: -1, message: "上传成功", jsonDic: nil)
+                    Account.returnData(response: response, status: 1, message: "上传成功", jsonDic: nil)
                 }else{
-                    Account.returnData(response: response, status: 1, message: "上传失败", jsonDic: nil)
+                    Account.returnData(response: response, status: -1, message: "上传失败", jsonDic: nil)
                 }
             }
         }
