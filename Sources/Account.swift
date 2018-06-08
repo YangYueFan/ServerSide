@@ -298,6 +298,17 @@ open class Account{
         return result.mysqlResult?.numRows() != nil ? ((result.mysqlResult?.numRows()) != nil) : false
     }
     
+    /// 检查token与账户是否对应
+    ///
+    /// - Parameters:
+    ///   - userID: userID
+    ///   - token: token
+    /// - Returns: 返回数据
+    class func checkToken(userID:String ,token:String) -> Bool {
+        let result = DataBaseManager().selectAllDataBaseSQLwhere(tableName: table_Token, keyValue: "uID = " + userID + " AND Token = '" + token + "'")
+        return result.mysqlResult?.numRows() != nil ? ((result.mysqlResult?.numRows()) != nil) : false
+    }
+    
     
     
     /// 保存头像
