@@ -18,7 +18,7 @@ public class LiveRounts {
         // 添加接口,请求方式,路径
         
         //*********************************************************************
-        // 获取Live
+        // MARK: - 获取Live
         routes.add(method: .get , uri: "/getLiveList") { (request, response) in
             LiveRounts.handle_live_GetLiveList(request: request, response: response)
         }
@@ -27,12 +27,19 @@ public class LiveRounts {
         }
         
         //*********************************************************************
+        // MARK: - 发布心情
         routes.add(method: .post, uri: "/issueHeart") { (request, response) in
             LiveRounts.handle_live_issueHeart(request: request, response: response)
         }
         
         //*********************************************************************
-        //所有"/liveRes"开头的URL都映射到了物理路径
+        // MARK: - 点赞
+        routes.add(method: .post, uri: "/AddLike") { (request, response) in
+            LiveRounts.handle_live_AddLike(request: request, response: response)
+        }
+        
+        //*********************************************************************
+        // MARK: - 所有"/liveRes"开头的URL都映射到了物理路径
         routes.add(method: .get, uri: "/liveRes/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
@@ -44,7 +51,6 @@ public class LiveRounts {
             
             handler.handleRequest(request: request, response: response)
         }
-        //所有"/res"开头的URL都映射到了物理路径
         routes.add(method: .post, uri: "/liveRes/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
@@ -58,6 +64,8 @@ public class LiveRounts {
         }
     }
     
+    
+    // MARK: - 处理获取Live列表
     static func handle_live_GetLiveList(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
@@ -111,6 +119,8 @@ public class LiveRounts {
     }
     
     
+    
+    // MARK: - 发布心情
     static func handle_live_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
@@ -161,16 +171,36 @@ public class LiveRounts {
     }
     
     
+    // MARK: -  处理点赞或取消点赞
+    static func handle_live_AddLike(request : HTTPRequest ,response : HTTPResponse) {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
+        }
+        guard let apiToken = request.param(name: "apiToken") else {
+            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return
+        }
+        if Account.checkToken(userID: userID, token: apiToken) == false{
+            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            return
+        }
+        guard let liveId = request.param(name: "liveId") else {
+            Account.returnData(response: response, status: -1, message: "缺少 liveId", jsonDic: nil)
+            return
+        }
+        guard let type = request.param(name: "type") else {
+            Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
+            return
+        }
+        
+        let _ = DataBaseManager().custom(sqlStr: "Call liveAddLike('\(userID)','\(liveId)','\(type)')")
+        Account.returnData(response: response, status: 1, message: "点赞成功", jsonDic: nil)
+    }
     
     
-    
-    
-    /// 保存头像
-    ///
-    /// - Parameters:
-    ///   - request:
-    ///   - userAccount: 用户名
-    /// - Returns: 图片路径 或 ""
+    // MARK: -  保存头像
     class func saveLiveRes(request:HTTPRequest,userId:String) -> String {
         // 通过操作fileUploads数组来掌握文件上传的情况
         // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
