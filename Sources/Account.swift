@@ -17,7 +17,7 @@ open class Account{
     
     static let table_account = "UserInfo"
     
-    // 处理User登录
+    // MARK: - 处理User登录
     static func handle_User_Login (request : HTTPRequest ,response : HTTPResponse){
         //标配
         var status = 1
@@ -78,7 +78,7 @@ open class Account{
     }
     
 
-    // 处理User注册
+    // MARK: - 处理User注册
     static func handle_User_Register (request : HTTPRequest ,response : HTTPResponse){
         //标配
         var status = 1
@@ -138,7 +138,7 @@ open class Account{
     }
     
     
-    // 处理上传头像
+    // MARK: - 处理上传头像
     static func handle_User_UploadIcon (request : HTTPRequest ,response : HTTPResponse){
         
         guard let userAccount = request.param(name: "userAccount") else {
@@ -162,7 +162,7 @@ open class Account{
         
     }
     
-    // 用户完善信息
+    // MARK: - 用户完善信息
     static func handle_User_CompleteInfo(request : HTTPRequest, response : HTTPResponse ) {
         //标配
         response.setHeader( .contentType, value: "text/html")          //响应头
@@ -227,7 +227,45 @@ open class Account{
         
     }
     
-    // 获取首页数据
+    
+    // MARK: - 修改用户密码
+    static func handle_User_ChangePW (request : HTTPRequest ,response : HTTPResponse){
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        guard let apiToken = request.param(name: "apiToken") else {
+            self.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return
+        }
+        guard let userId = request.param(name: "userId") else {
+            self.returnData(response: response, status: -1, message: "缺少 userId", jsonDic: nil)
+            return
+        }
+        if checkToken(userID: userId, token: apiToken) == false {
+            self.returnData(response: response, status: -1, message: "userId/apiToken错误", jsonDic: nil)
+            return
+        }
+        guard let oldPW = request.param(name: "oldPW") else {
+            self.returnData(response: response, status: -1, message: "缺少 oldPW", jsonDic: nil)
+            return
+        }
+        guard let newPW = request.param(name: "newPW") else {
+            self.returnData(response: response, status: -1, message: "缺少 newPW", jsonDic: nil)
+            return
+        }
+        
+        let result = DataBaseManager().custom(sqlStr: "Call chengeUserPassword('\(userId)','\(oldPW)','\(newPW)')")
+        var message = ""
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            print(data)
+            message = data[0]!
+        })
+        self.returnData(response: response, status: message.hasSuffix("成功") ? 0 : -1, message: message, jsonDic: nil)
+        return
+        
+        
+    }
+    
+    
+    // MARK: - 获取首页数据
     static func handle_Get_Items (request : HTTPRequest ,response : HTTPResponse){
         var jsonDic = [String:Any]()
         response.setHeader( .contentType, value: "text/html")          //响应头

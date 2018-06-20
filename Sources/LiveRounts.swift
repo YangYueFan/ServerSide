@@ -79,16 +79,31 @@ public class LiveRounts {
             Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
             return
         }
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)')")
+        guard let pageIndex = request.param(name: "pageIndex") else {
+            Account.returnData(response: response, status: -1, message: "缺少 pageIndex", jsonDic: nil)
+            return
+        }
+        guard let pageSize = request.param(name: "pageSize") else {
+            Account.returnData(response: response, status: -1, message: "缺少 pageSize", jsonDic: nil)
+            return
+        }
+        
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
-            dic["liveId"] = row[0]
-            dic["liveContent"] = row[1]
-            dic["livePhotosUrl"] = row[2]
-            dic["liveAddTime"] = row[3]
-            dic["liveVideoUrl"] = row[4]
-            dic["liveVideoImageUrl"] = row[5]
+            dic["liveId"]           = row[0]
+            dic["liveContent"]      = row[1]
+            dic["livePhotosUrl"]    = row[2]
+            dic["liveAddTime"]      = row[3]
+            dic["liveUserId"]       = row[4]
+            dic["liveVideoUrl"]     = row[5]
+            dic["liveVideoImageUrl"] = row[6]
+            dic["liveUserName"]     = row[7]
+            dic["liveUserIcon"]     = row[8]
+            dic["liveCommentNum"]   = row[9]
+            dic["liveLikeNum"]      = row[10]
+            dic["isMyLike"]         = row[11]
             resultArray.append(dic)
         })
         Account.returnData(response: response, status: 1, message: "成功", jsonDic: resultArray)
@@ -178,7 +193,7 @@ public class LiveRounts {
                     // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
                     let file = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
                     if file.path.count > 0 {
-                        paths.append("/liveRes/" + upload.fileName)
+                        paths.append("liveRes/" + upload.fileName)
                     }else{
                         return ""
                     }
