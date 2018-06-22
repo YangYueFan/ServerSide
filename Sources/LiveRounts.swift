@@ -34,9 +34,15 @@ public class LiveRounts {
         
         //*********************************************************************
         // MARK: - 点赞
-        routes.add(method: .post, uri: "/AddLike") { (request, response) in
+        routes.add(method: .post, uri: "/addLike") { (request, response) in
             LiveRounts.handle_live_AddLike(request: request, response: response)
         }
+        //*********************************************************************
+        // MARK: - 点赞
+        routes.add(method: .post, uri: "/followLiveUser") { (request, response) in
+            LiveRounts.handle_Live_follow(request: request, response: response)
+        }
+        
         
         //*********************************************************************
         // MARK: - 所有"/liveRes"开头的URL都映射到了物理路径
@@ -112,6 +118,7 @@ public class LiveRounts {
             dic["liveCommentNum"]   = row[9]
             dic["liveLikeNum"]      = row[10]
             dic["isMyLike"]         = row[11]
+            dic["isFollowing"]      = row[12]
             resultArray.append(dic)
         })
         Account.returnData(response: response, status: 1, message: "成功", jsonDic: resultArray)
@@ -196,7 +203,41 @@ public class LiveRounts {
         }
         
         let _ = DataBaseManager().custom(sqlStr: "Call liveAddLike('\(userID)','\(liveId)','\(type)')")
-        Account.returnData(response: response, status: 1, message: "点赞成功", jsonDic: nil)
+        if type == "0" {
+            Account.returnData(response: response, status: 1, message: "取消点赞成功", jsonDic: nil)
+        }else{
+            Account.returnData(response: response, status: 1, message: "点赞成功", jsonDic: nil)
+        }
+    }
+    
+    static func handle_Live_follow(request: HTTPRequest, response: HTTPResponse)  {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
+        }
+        guard let apiToken = request.param(name: "apiToken") else {
+            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return
+        }
+        if Account.checkToken(userID: userID, token: apiToken) == false{
+            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            return
+        }
+        guard let fUserId = request.param(name: "fUserId") else {
+            Account.returnData(response: response, status: -1, message: "缺少 fUserId", jsonDic: nil)
+            return
+        }
+        guard let type = request.param(name: "type") else {
+            Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
+            return
+        }
+        let _ = DataBaseManager().custom(sqlStr: "Call follow('\(userID)','\(fUserId)','\(type)')")
+        if type == "0" {
+            Account.returnData(response: response, status: 1, message: "取消关注成功", jsonDic: nil)
+        }else{
+            Account.returnData(response: response, status: 1, message: "关注成功", jsonDic: nil)
+        }
     }
     
     
@@ -235,5 +276,7 @@ public class LiveRounts {
         }
         return ""
     }
+    
+    
 
 }
