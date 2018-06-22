@@ -38,9 +38,15 @@ public class LiveRounts {
             LiveRounts.handle_live_AddLike(request: request, response: response)
         }
         //*********************************************************************
-        // MARK: - 点赞
+        // MARK: - 关注
         routes.add(method: .post, uri: "/followLiveUser") { (request, response) in
             LiveRounts.handle_Live_follow(request: request, response: response)
+        }
+        
+        //*********************************************************************
+        // MARK: - 删除心情
+        routes.add(method: .post, uri: "/deleteLive") { (request, response) in
+            LiveRounts.handle_Live_delete(request: request, response: response)
         }
         
         
@@ -210,6 +216,8 @@ public class LiveRounts {
         }
     }
     
+    
+    //Mark : - 关注
     static func handle_Live_follow(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         guard let userID = request.param(name: "userID") else {
@@ -240,14 +248,50 @@ public class LiveRounts {
         }
     }
     
+    //Mark : - 删除Live
+    static func handle_Live_delete(request: HTTPRequest, response: HTTPResponse)  {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
+        }
+        guard let apiToken = request.param(name: "apiToken") else {
+            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return
+        }
+        if Account.checkToken(userID: userID, token: apiToken) == false{
+            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            return
+        }
+        guard let liveID = request.param(name: "liveID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+            return
+        }
+        
+        
+        var dic = [String : String]()
+        let result = DataBaseManager().custom(sqlStr: "Call getLive('\(liveID)')")
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            dic["livePhotosUrl"]    = data[2]
+            dic["liveVideoUrl"]     = data[5]
+            dic["liveVideoImageUrl"] = data[6]
+        })
+        if dic.count > 0 {
+            //删除本地资源
+            LiveRounts.deletelocalRes(dic: dic)
+        }
+        
+        let _ = DataBaseManager().custom(sqlStr: "Call deleteLive('\(liveID)')")
+        Account.returnData(response: response, status: 1, message: "删除成功", jsonDic: nil)
+        
+    }
+    
     
     // MARK: -  保存头像
     class func saveLiveRes(request:HTTPRequest,userId:String) -> String {
         // 通过操作fileUploads数组来掌握文件上传的情况
         // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
-        
         if let uploads = request.postFileUploads, uploads.count > 0 {
-            
             // 创建路径用于存储已上传文件
             let fileDir = Dir(Dir.workingDir.path + "Live_File")
             do {
@@ -258,7 +302,6 @@ public class LiveRounts {
             
             var paths = [String]()
             for upload in uploads{
-                
                 let thisFile = File(upload.tmpFileName) //临时位置
                 do {
                     // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
@@ -277,6 +320,31 @@ public class LiveRounts {
         return ""
     }
     
+    //Mark : - 删除本地资源文件
+    class func deletelocalRes(dic:[String:String]) {
+        //如果有图片  删除图片资源
+        if dic["livePhotosUrl"]!.count > 0  {
+            let pathArr : [String] = dic["livePhotosUrl"]!.components(separatedBy: ",")
+            for str in pathArr {
+                let path = str.substring(from: String.Index.init(encodedOffset: 7))
+                let file = File.init(Dir.workingDir.path + "Live_File" + path)
+                file.delete()
+            }
+        }
+        
+        //如果有视频  删除视频资源
+        if dic["liveVideoUrl"]!.count > 0  {
+            let path = dic["liveVideoUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
+            let file = File.init(Dir.workingDir.path + "Live_File" + path)
+            file.delete()
+        }
+        //如果有视频默认图片  删除默认图片
+        if dic["liveVideoImageUrl"]!.count > 0  {
+            let path = dic["liveVideoImageUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
+            let file = File.init(Dir.workingDir.path + "Live_File" + path)
+            file.delete()
+        }
+    }
     
 
 }
