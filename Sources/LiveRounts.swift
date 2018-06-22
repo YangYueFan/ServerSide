@@ -17,40 +17,55 @@ public class LiveRounts {
     class public func configure(routes: inout Routes) {
         // 添加接口,请求方式,路径
         
-        //*********************************************************************
+        
         // MARK: - 获取Live
-        routes.add(method: .get , uri: "/getLiveList") { (request, response) in
-            LiveRounts.handle_live_GetLiveList(request: request, response: response)
-        }
         routes.add(method: .post , uri: "/getLiveList") { (request, response) in
             LiveRounts.handle_live_GetLiveList(request: request, response: response)
         }
         
-        //*********************************************************************
+        
         // MARK: - 发布心情
         routes.add(method: .post, uri: "/issueHeart") { (request, response) in
             LiveRounts.handle_live_issueHeart(request: request, response: response)
         }
         
-        //*********************************************************************
+        
         // MARK: - 点赞
         routes.add(method: .post, uri: "/addLike") { (request, response) in
             LiveRounts.handle_live_AddLike(request: request, response: response)
         }
-        //*********************************************************************
+        
+        
         // MARK: - 关注
         routes.add(method: .post, uri: "/followLiveUser") { (request, response) in
             LiveRounts.handle_Live_follow(request: request, response: response)
         }
         
-        //*********************************************************************
+        
+        // MARK: - 获取单独心情
+        routes.add(method: .post, uri: "/getLive") { (request, response) in
+            LiveRounts.handle_Live_getAlone(request: request, response: response)
+        }
+        
+        
+        // MARK: - 获取评论
+        routes.add(method: .post, uri: "/getLiveComment") { (request, response) in
+            LiveRounts.handle_Live_getLiveComment(request: request, response: response)
+        }
+        
+        // MARK: - 发布评论
+        routes.add(method: .post, uri: "/addLiveComment") { (request, response) in
+            LiveRounts.handle_Live_addLiveComment(request: request, response: response)
+        }
+        
+        
         // MARK: - 删除心情
         routes.add(method: .post, uri: "/deleteLive") { (request, response) in
             LiveRounts.handle_Live_delete(request: request, response: response)
         }
         
         
-        //*********************************************************************
+        
         // MARK: - 所有"/liveRes"开头的URL都映射到了物理路径
         routes.add(method: .get, uri: "/liveRes/**") { (request, response) in
             // 获得符合通配符的请求路径
@@ -81,17 +96,8 @@ public class LiveRounts {
     static func handle_live_GetLiveList(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
-        guard let userID = request.param(name: "userID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
-            return
-        }
-        guard let apiToken = request.param(name: "apiToken") else {
-            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
-            return
-        }
-        if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
-            return
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
         }
         
         //type : 0 全部 ，1 我发布的， 2 我认识的 ， 3 我收藏的
@@ -107,8 +113,8 @@ public class LiveRounts {
             Account.returnData(response: response, status: -1, message: "缺少 pageSize", jsonDic: nil)
             return
         }
-        
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)')")
+    
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(request.param(name: "userID")!)','\(type)','\(pageIndex)','\(pageSize)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
@@ -137,17 +143,9 @@ public class LiveRounts {
     static func handle_live_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
-        guard let userID = request.param(name: "userID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
-            return
-        }
-        guard let apiToken = request.param(name: "apiToken") else {
-            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
-            return
-        }
-        if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
-            return
+        let userID = request.param(name: "userID")!
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
         }
         guard let content = request.param(name: "content") else {
             Account.returnData(response: response, status: -1, message: "缺少 content", jsonDic: nil)
@@ -157,7 +155,6 @@ public class LiveRounts {
             Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
             return
         }
-        
         
         if type == "1" {
             let result = DataBaseManager().custom(sqlStr: "Call issueHeart('\(userID)','\(content)','\("")','\("")','\("")')")
@@ -187,17 +184,9 @@ public class LiveRounts {
     // MARK: -  处理点赞或取消点赞
     static func handle_live_AddLike(request : HTTPRequest ,response : HTTPResponse) {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        guard let userID = request.param(name: "userID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
-            return
-        }
-        guard let apiToken = request.param(name: "apiToken") else {
-            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
-            return
-        }
-        if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
-            return
+        let userID = request.param(name: "userID")!
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
         }
         guard let liveId = request.param(name: "liveId") else {
             Account.returnData(response: response, status: -1, message: "缺少 liveId", jsonDic: nil)
@@ -217,20 +206,12 @@ public class LiveRounts {
     }
     
     
-    //Mark : - 关注
+    // MARK: - 关注
     static func handle_Live_follow(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        guard let userID = request.param(name: "userID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
-            return
-        }
-        guard let apiToken = request.param(name: "apiToken") else {
-            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
-            return
-        }
-        if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
-            return
+        let userID = request.param(name: "userID")!
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
         }
         guard let fUserId = request.param(name: "fUserId") else {
             Account.returnData(response: response, status: -1, message: "缺少 fUserId", jsonDic: nil)
@@ -248,27 +229,18 @@ public class LiveRounts {
         }
     }
     
-    //Mark : - 删除Live
+    // MARK: - 删除Live
     static func handle_Live_delete(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        guard let userID = request.param(name: "userID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
-            return
-        }
-        guard let apiToken = request.param(name: "apiToken") else {
-            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
-            return
-        }
-        if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
-            return
+        
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
         }
         guard let liveID = request.param(name: "liveID") else {
             Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
             return
         }
-        
-        
+
         var dic = [String : String]()
         let result = DataBaseManager().custom(sqlStr: "Call getLive('\(liveID)')")
         result.mysqlResult?.forEachRow(callback: { (data) in
@@ -285,6 +257,96 @@ public class LiveRounts {
         Account.returnData(response: response, status: 1, message: "删除成功", jsonDic: nil)
         
     }
+    
+    
+    // MARK: - 获取Live评论
+    static func handle_Live_getLiveComment(request: HTTPRequest, response: HTTPResponse)  {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
+        }
+        guard let liveID = request.param(name: "liveID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+            return
+        }
+
+        var dic = [String : String]()
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveComment('\(liveID)')")
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            //id    liveID    content    type    toUserID    toUserName    cAddTime
+            dic["cId"]          = data[0]
+            dic["liveID"]       = data[1]
+            dic["content"]      = data[2]
+            dic["type"]         = data[3]
+            dic["toUserID"]     = data[4]
+            dic["toUserName"]   = data[5]
+            dic["cAddTime"]     = data[6]
+        })
+        Account.returnData(response: response, status: 1, message: "获取Live评论成功", jsonDic: dic)
+    }
+    
+    
+    // MARK: - 发布Live评论
+    static func handle_Live_addLiveComment(request: HTTPRequest, response: HTTPResponse)  {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
+        }
+        let userID = request.param(name: "userID")!
+        guard let liveID = request.param(name: "liveID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+            return
+        }
+        guard let content = request.param(name: "content") else {
+            Account.returnData(response: response, status: -1, message: "缺少 content", jsonDic: nil)
+            return
+        }
+        guard let type = request.param(name: "type") else {
+            Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
+            return
+        }
+        
+        //评论 1   回复 2
+        let _ = type == "1" ?
+            DataBaseManager().custom(sqlStr: "Call addLiveComment('\(liveID)','\(userID)','\(content)','\(type)','\("")','\("")')") :
+            DataBaseManager().custom(sqlStr: "Call addLiveComment('\(liveID)','\(userID)','\(content)','\(type)','\(request.param(name: "toUserID")!)','\(request.param(name: "toUserName")!)')")
+        Account.returnData(response: response, status: 1, message: "评论成功", jsonDic: nil)
+    }
+    
+    
+    
+    
+    // MARK: - 获取单独的Live
+    static func handle_Live_getAlone(request: HTTPRequest, response: HTTPResponse)  {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
+        }
+        guard let liveID = request.param(name: "liveID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+            return
+        }
+        
+        var dic = [String : String]()
+        let result = DataBaseManager().custom(sqlStr: "Call getLive('\(liveID)')")
+        result.mysqlResult?.forEachRow(callback: { (row) in
+            dic["liveId"]           = row[0]
+            dic["liveContent"]      = row[1]
+            dic["livePhotosUrl"]    = row[2]
+            dic["liveAddTime"]      = row[3]
+            dic["liveUserId"]       = row[4]
+            dic["liveVideoUrl"]     = row[5]
+            dic["liveVideoImageUrl"] = row[6]
+            dic["liveUserName"]     = row[7]
+            dic["liveUserIcon"]     = row[8]
+            dic["liveCommentNum"]   = row[9]
+            dic["liveLikeNum"]      = row[10]
+            dic["isMyLike"]         = row[11]
+            dic["isFollowing"]      = row[12]
+        })
+        Account.returnData(response: response, status: 1, message: "成功", jsonDic: dic)
+    }
+    
     
     
     // MARK: -  保存头像
@@ -320,7 +382,7 @@ public class LiveRounts {
         return ""
     }
     
-    //Mark : - 删除本地资源文件
+    // MARK : - 删除本地资源文件
     class func deletelocalRes(dic:[String:String]) {
         //如果有图片  删除图片资源
         if dic["livePhotosUrl"]!.count > 0  {
@@ -344,6 +406,23 @@ public class LiveRounts {
             let file = File.init(Dir.workingDir.path + "Live_File" + path)
             file.delete()
         }
+    }
+    
+    // MARK: - 检测用户名ID 与Token 是否匹配 （增加安全性）token由登录接口获取
+    class func cheakUser(request:HTTPRequest,response:HTTPResponse) -> Bool {
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return false
+        }
+        guard let apiToken = request.param(name: "apiToken") else {
+            Account.returnData(response: response, status: -1, message: "缺少 apiToken", jsonDic: nil)
+            return false
+        }
+        if Account.checkToken(userID: userID, token: apiToken) == false{
+            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            return false
+        }
+        return true
     }
     
 
