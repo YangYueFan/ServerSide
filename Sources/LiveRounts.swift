@@ -270,19 +270,24 @@ public class LiveRounts {
             return
         }
 
-        var dic = [String : String]()
+        var arr = [[String : String]]()
         let result = DataBaseManager().custom(sqlStr: "Call getLiveComment('\(liveID)')")
         result.mysqlResult?.forEachRow(callback: { (data) in
             //id    liveID    content    type    toUserID    toUserName    cAddTime
+            var dic = [String : String]()
             dic["cId"]          = data[0]
-            dic["liveID"]       = data[1]
-            dic["content"]      = data[2]
-            dic["type"]         = data[3]
-            dic["toUserID"]     = data[4]
-            dic["toUserName"]   = data[5]
-            dic["cAddTime"]     = data[6]
+            dic["cUserID"]      = data[1]
+            dic["cUserName"]    = data[2]
+            dic["liveID"]       = data[3]
+            dic["content"]      = data[4]
+            dic["type"]         = data[5]
+            dic["toUserID"]     = data[6]
+            dic["toUserName"]   = data[7] != nil ? data[7] : ""
+            dic["cAddTime"]     = data[8]
+            dic["cImgUrl"]      = data[9]
+            arr.append(dic)
         })
-        Account.returnData(response: response, status: 1, message: "获取Live评论成功", jsonDic: dic)
+        Account.returnData(response: response, status: 1, message: "获取Live评论成功", jsonDic: arr)
     }
     
     
