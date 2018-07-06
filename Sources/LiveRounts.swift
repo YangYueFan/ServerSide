@@ -58,6 +58,10 @@ public class LiveRounts {
             LiveRounts.handle_Live_addLiveComment(request: request, response: response)
         }
         
+        routes.add(method: .post, uri: "/deleteLiveComment") { (request, response) in
+            LiveRounts.handle_Live_deleteLiveComment(request: request, response: response)
+        }
+        
         
         // MARK: - 删除心情
         routes.add(method: .post, uri: "/deleteLive") { (request, response) in
@@ -96,10 +100,10 @@ public class LiveRounts {
     static func handle_live_GetLiveList(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
-            return;
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
         }
-        
         //type : 0 全部 ，1 我发布的， 2 我认识的 ， 3 我收藏的
         guard let type = request.param(name: "type") else {
             Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
@@ -114,7 +118,7 @@ public class LiveRounts {
             return
         }
     
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(request.param(name: "userID")!)','\(type)','\(pageIndex)','\(pageSize)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
@@ -318,15 +322,29 @@ public class LiveRounts {
         Account.returnData(response: response, status: 1, message: "评论成功", jsonDic: nil)
     }
     
-    
+    //MARK: - 删除评论
+    static func handle_Live_deleteLiveComment(request: HTTPRequest, response: HTTPResponse) {
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
+        }
+        guard let cID = request.param(name: "commentID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 commentID", jsonDic: nil)
+            return
+        }
+        let result = DataBaseManager().custom(sqlStr: "Call deleteLiveComment('\(cID)')")
+        if result.success {
+            Account.returnData(response: response, status: 1, message: "成功", jsonDic: nil)
+        }else{
+            Account.returnData(response: response, status: 0, message: "失败", jsonDic: nil)
+        }
+    }
     
     
     // MARK: - 获取单独的Live
     static func handle_Live_getAlone(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
-            return;
-        }
+        
         guard let liveID = request.param(name: "liveID") else {
             Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
             return
@@ -424,7 +442,7 @@ public class LiveRounts {
             return false
         }
         if Account.checkToken(userID: userID, token: apiToken) == false{
-            Account.returnData(response: response, status: -1, message: "userAccount/apiToken错误", jsonDic: nil)
+            Account.returnData(response: response, status: -1, message: "userID/apiToken错误", jsonDic: nil)
             return false
         }
         return true
