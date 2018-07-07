@@ -146,8 +146,6 @@ public class LiveRounts {
     // MARK: - 发布心情
     static func handle_live_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        
-        let userID = request.param(name: "userID")!
         if LiveRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -159,7 +157,7 @@ public class LiveRounts {
             Account.returnData(response: response, status: -1, message: "缺少 type", jsonDic: nil)
             return
         }
-        
+        let userID = request.param(name: "userID")!
         if type == "1" {
             let result = DataBaseManager().custom(sqlStr: "Call issueHeart('\(userID)','\(content)','\("")','\("")','\("")')")
             if result.success {

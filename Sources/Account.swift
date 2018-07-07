@@ -264,6 +264,54 @@ open class Account{
         
     }
     
+    static func handle_User_ChangeInfo (request : HTTPRequest ,response : HTTPResponse){
+        response.setHeader( .contentType, value: "text/html")          //响应头
+        if LiveRounts.cheakUser(request: request, response: response)  == false {
+            return;
+        }
+        guard let nickname = request.param(name: "nickname") else {
+            self.returnData(response: response, status: -1, message: "缺少 nickname", jsonDic: nil)
+            return
+        }
+        guard let sex = request.param(name: "sex") else {
+            self.returnData(response: response, status: -1, message: "缺少 sex", jsonDic: nil)
+            return
+        }
+        guard let Age = request.param(name: "Age") else {
+            self.returnData(response: response, status: -1, message: "缺少 Age", jsonDic: nil)
+            return
+        }
+        guard let userAccount = request.param(name: "userAccount") else {
+            self.returnData(response: response, status: -1, message: "缺少 userAccount", jsonDic: nil)
+            return
+        }
+        let result = DataBaseManager().custom(sqlStr: "Call changeInfo('\(nickname)','\(sex)','\(Age)')")
+        var jsonDic = [String : String]()
+        if result.success {
+            let result1 = DataBaseManager().custom(sqlStr: "Call getUserInfo('\(userAccount)')")
+            result1.mysqlResult?.forEachRow(callback: { (data) in
+                print(data)
+                if data.count > 1 {
+                    jsonDic["Age"]          = data[0]
+                    jsonDic["UserID"]       = data[1]
+                    jsonDic["Name"]         = data[2]
+                    jsonDic["imgUrl"]       = data[3]
+                    jsonDic["ClassType"]    = data[4]
+                    jsonDic["Sex"]          = data[5]
+                    jsonDic["Age"]          = data[6]
+                    jsonDic["apiToken"]     = data[7]
+                    jsonDic["isLogined"]    = data[8]
+                }
+            })
+            self.returnData(response: response, status: 1 , message: "修改成功", jsonDic: jsonDic)
+        }else{
+            self.returnData(response: response, status: -1 , message: "修改失败", jsonDic: jsonDic)
+        }
+        
+        
+        
+    }
+    
     
     // MARK: - 获取首页数据
     static func handle_Get_Items (request : HTTPRequest ,response : HTTPResponse){
