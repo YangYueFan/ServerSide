@@ -67,6 +67,10 @@ public class LiveRounts {
         routes.add(method: .post, uri: "/deleteLive") { (request, response) in
             LiveRounts.handle_Live_delete(request: request, response: response)
         }
+        // MARK: - 获取用户主页信息
+        routes.add(method: .post, uri: "/getLiveUserInfo") { (request, response) in
+            LiveRounts.handle_Live_getLiveUserInfo(request: request, response: response)
+        }
         
         
         
@@ -368,6 +372,25 @@ public class LiveRounts {
             dic["liveLikeNum"]      = row[10]
             dic["isMyLike"]         = row[11]
             dic["isFollowing"]      = row[12]
+        })
+        Account.returnData(response: response, status: 1, message: "成功", jsonDic: dic)
+    }
+    
+    // MARK: - 获取用户主页信息
+    class func handle_Live_getLiveUserInfo(request: HTTPRequest, response: HTTPResponse) {
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
+        }
+        var dic = [String : String]()
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveUserInfo('\(userID)')")
+        result.mysqlResult?.forEachRow(callback: { (row) in
+            dic["userId"]           = userID
+            dic["userName"]         = row[0]
+            dic["imgUrl"]           = row[1]
+            dic["LikeCount"]        = row[2]
+            dic["FollowCount"]     = row[3]
+            dic["LiveCount"]        = row[4]
         })
         Account.returnData(response: response, status: 1, message: "成功", jsonDic: dic)
     }
