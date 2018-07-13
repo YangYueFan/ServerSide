@@ -64,6 +64,7 @@ open class Account{
                 jsonDic["Age"]          = data[6]
                 jsonDic["apiToken"]     = data[7]
                 jsonDic["isLogined"]    = data[8]
+                jsonDic["email"]        = data[9]
             }else{
                 message = data[0]!
             }
@@ -214,7 +215,7 @@ open class Account{
                     jsonDic["Sex"]          = data[5]
                     jsonDic["Age"]          = data[6]
                     jsonDic["apiToken"]     = data[7]
-                    jsonDic["isLogined"]    = data[8]
+                    jsonDic["email"]        = data[9]
                 }
             })
 
@@ -277,15 +278,19 @@ open class Account{
             self.returnData(response: response, status: -1, message: "缺少 sex", jsonDic: nil)
             return
         }
-        guard let Age = request.param(name: "Age") else {
-            self.returnData(response: response, status: -1, message: "缺少 Age", jsonDic: nil)
+        guard let Age = request.param(name: "age") else {
+            self.returnData(response: response, status: -1, message: "缺少 age", jsonDic: nil)
             return
         }
         guard let userAccount = request.param(name: "userAccount") else {
             self.returnData(response: response, status: -1, message: "缺少 userAccount", jsonDic: nil)
             return
         }
-        let result = DataBaseManager().custom(sqlStr: "Call changeInfo('\(nickname)','\(sex)','\(Age)')")
+        guard let email = request.param(name: "email") else {
+            self.returnData(response: response, status: -1, message: "缺少 email", jsonDic: nil)
+            return
+        }
+        let result = DataBaseManager().custom(sqlStr: "Call changeInfo('\(nickname)','\(sex)','\(Age)','\(email)')")
         var jsonDic = [String : String]()
         if result.success {
             let result1 = DataBaseManager().custom(sqlStr: "Call getUserInfo('\(userAccount)')")
@@ -301,6 +306,7 @@ open class Account{
                     jsonDic["Age"]          = data[6]
                     jsonDic["apiToken"]     = data[7]
                     jsonDic["isLogined"]    = data[8]
+                    jsonDic["email"]        = data[9]
                 }
             })
             self.returnData(response: response, status: 1 , message: "修改成功", jsonDic: jsonDic)

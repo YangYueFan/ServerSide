@@ -117,8 +117,12 @@ public class LiveRounts {
             Account.returnData(response: response, status: -1, message: "缺少 pageSize", jsonDic: nil)
             return
         }
+        var myId = request.param(name: "myId")
+        if myId == nil {
+            myId = userID
+        }
     
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)','\(myId!)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
