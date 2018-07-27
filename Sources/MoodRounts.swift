@@ -1,5 +1,5 @@
 //
-//  LiveRounts.swift
+//  MoodRounts.swift
 //  PerfectTemplate
 //
 //  Created by 科技部iOS on 2018/6/8.
@@ -8,90 +8,90 @@ import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
 
-public class LiveRounts {
+public class MoodRounts {
     
-    static let table_Live           = "Live"
-    static let table_LiveComment    = "LiveComment"
-    static let table_LiveLike       = "LiveLike"
+    static let table_Mood           = "Mood"
+    static let table_MoodComment    = "MoodComment"
+    static let table_MoodLike       = "MoodLike"
     //MARK: 注册路由
     class public func configure(routes: inout Routes) {
         // 添加接口,请求方式,路径
         
         
-        // MARK: - 获取Live
-        routes.add(method: .post , uri: "/getLiveList") { (request, response) in
-            LiveRounts.handle_live_GetLiveList(request: request, response: response)
+        // MARK: - 获取Mood
+        routes.add(method: .post , uri: "/getMoodList") { (request, response) in
+            MoodRounts.handle_mood_GetMoodList(request: request, response: response)
         }
         
         
         // MARK: - 发布心情
         routes.add(method: .post, uri: "/issueHeart") { (request, response) in
-            LiveRounts.handle_live_issueHeart(request: request, response: response)
+            MoodRounts.handle_mood_issueHeart(request: request, response: response)
         }
         
         
         // MARK: - 点赞
         routes.add(method: .post, uri: "/addLike") { (request, response) in
-            LiveRounts.handle_live_AddLike(request: request, response: response)
+            MoodRounts.handle_mood_AddLike(request: request, response: response)
         }
         
         
         // MARK: - 关注
-        routes.add(method: .post, uri: "/followLiveUser") { (request, response) in
-            LiveRounts.handle_Live_follow(request: request, response: response)
+        routes.add(method: .post, uri: "/followMoodUser") { (request, response) in
+            MoodRounts.handle_Mood_follow(request: request, response: response)
         }
         
         
         // MARK: - 获取单独心情
-        routes.add(method: .post, uri: "/getLive") { (request, response) in
-            LiveRounts.handle_Live_getAlone(request: request, response: response)
+        routes.add(method: .post, uri: "/getMood") { (request, response) in
+            MoodRounts.handle_Mood_getAlone(request: request, response: response)
         }
         
         
         // MARK: - 获取评论
-        routes.add(method: .post, uri: "/getLiveComment") { (request, response) in
-            LiveRounts.handle_Live_getLiveComment(request: request, response: response)
+        routes.add(method: .post, uri: "/getMoodComment") { (request, response) in
+            MoodRounts.handle_Mood_getMoodComment(request: request, response: response)
         }
         
         // MARK: - 发布评论
-        routes.add(method: .post, uri: "/addLiveComment") { (request, response) in
-            LiveRounts.handle_Live_addLiveComment(request: request, response: response)
+        routes.add(method: .post, uri: "/addMoodComment") { (request, response) in
+            MoodRounts.handle_Mood_addMoodComment(request: request, response: response)
         }
         
-        routes.add(method: .post, uri: "/deleteLiveComment") { (request, response) in
-            LiveRounts.handle_Live_deleteLiveComment(request: request, response: response)
+        routes.add(method: .post, uri: "/deleteMoodComment") { (request, response) in
+            MoodRounts.handle_Mood_deleteMoodComment(request: request, response: response)
         }
         
         
         // MARK: - 删除心情
-        routes.add(method: .post, uri: "/deleteLive") { (request, response) in
-            LiveRounts.handle_Live_delete(request: request, response: response)
+        routes.add(method: .post, uri: "/deleteMood") { (request, response) in
+            MoodRounts.handle_Mood_delete(request: request, response: response)
         }
         // MARK: - 获取用户主页信息
-        routes.add(method: .post, uri: "/getLiveUserInfo") { (request, response) in
-            LiveRounts.handle_Live_getLiveUserInfo(request: request, response: response)
+        routes.add(method: .post, uri: "/getMoodUserInfo") { (request, response) in
+            MoodRounts.handle_Mood_getMoodUserInfo(request: request, response: response)
         }
         
         
         
-        // MARK: - 所有"/liveRes"开头的URL都映射到了物理路径
-        routes.add(method: .get, uri: "/liveRes/**") { (request, response) in
+        // MARK: - 所有"/moodRes"开头的URL都映射到了物理路径
+        routes.add(method: .get, uri: "/moodRes/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             
             // 用文档根目录初始化静态文件句柄
-            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Live_File").path)
+            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Mood_File").path)
             // 用我们的根目录和路径
             // 修改集触发请求的句柄
             
             handler.handleRequest(request: request, response: response)
         }
-        routes.add(method: .post, uri: "/liveRes/**") { (request, response) in
+        routes.add(method: .post, uri: "/moodRes/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             
             // 用文档根目录初始化静态文件句柄
-            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Live_File").path)
+            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Mood_File").path)
             // 用我们的根目录和路径
             // 修改集触发请求的句柄
             
@@ -100,8 +100,8 @@ public class LiveRounts {
     }
     
     
-    // MARK: - 处理获取Live列表
-    static func handle_live_GetLiveList(request : HTTPRequest ,response : HTTPResponse)  {
+    // MARK: - 处理获取Mood列表
+    static func handle_mood_GetMoodList(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
         guard let userID = request.param(name: "userID") else {
@@ -126,21 +126,21 @@ public class LiveRounts {
             myId = userID
         }
     
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveList('\(userID)','\(type)','\(pageIndex)','\(pageSize)','\(myId!)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getMoodList('\(userID)','\(type)','\(pageIndex)','\(pageSize)','\(myId!)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
-            dic["liveId"]           = row[0]
-            dic["liveContent"]      = row[1]
-            dic["livePhotosUrl"]    = row[2]
-            dic["liveAddTime"]      = row[3]
-            dic["liveUserId"]       = row[4]
-            dic["liveVideoUrl"]     = row[5]
-            dic["liveVideoImageUrl"] = row[6]
-            dic["liveUserName"]     = row[7]
-            dic["liveUserIcon"]     = row[8]
-            dic["liveCommentNum"]   = row[9]
-            dic["liveLikeNum"]      = row[10]
+            dic["moodId"]           = row[0]
+            dic["moodContent"]      = row[1]
+            dic["moodPhotosUrl"]    = row[2]
+            dic["moodAddTime"]      = row[3]
+            dic["moodUserId"]       = row[4]
+            dic["moodVideoUrl"]     = row[5]
+            dic["moodVideoImageUrl"] = row[6]
+            dic["moodUserName"]     = row[7]
+            dic["moodUserIcon"]     = row[8]
+            dic["moodCommentNum"]   = row[9]
+            dic["moodLikeNum"]      = row[10]
             dic["isMyLike"]         = row[11]
             dic["isFollowing"]      = row[12]
             resultArray.append(dic)
@@ -152,9 +152,9 @@ public class LiveRounts {
     
     
     // MARK: - 发布心情
-    static func handle_live_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
+    static func handle_mood_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let content = request.param(name: "content") else {
@@ -175,7 +175,7 @@ public class LiveRounts {
             }
         }else if type == "2"{
             //保存图片、视频资源
-            let path = LiveRounts.saveLiveRes(request: request,userId: userID)
+            let path = MoodRounts.saveMoodRes(request: request,userId: userID)
             if path == "" {
                 Account.returnData(response: response, status: -1, message: "上传失败", jsonDic: nil)
                 return
@@ -192,14 +192,14 @@ public class LiveRounts {
     
     
     // MARK: -  处理点赞或取消点赞
-    static func handle_live_AddLike(request : HTTPRequest ,response : HTTPResponse) {
+    static func handle_mood_AddLike(request : HTTPRequest ,response : HTTPResponse) {
         response.setHeader( .contentType, value: "text/html")          //响应头
         let userID = request.param(name: "userID")!
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
-        guard let liveId = request.param(name: "liveId") else {
-            Account.returnData(response: response, status: -1, message: "缺少 liveId", jsonDic: nil)
+        guard let moodId = request.param(name: "moodId") else {
+            Account.returnData(response: response, status: -1, message: "缺少 moodId", jsonDic: nil)
             return
         }
         guard let type = request.param(name: "type") else {
@@ -207,7 +207,7 @@ public class LiveRounts {
             return
         }
         
-        let _ = DataBaseManager().custom(sqlStr: "Call liveAddLike('\(userID)','\(liveId)','\(type)')")
+        let _ = DataBaseManager().custom(sqlStr: "Call moodAddLike('\(userID)','\(moodId)','\(type)')")
         if type == "0" {
             Account.returnData(response: response, status: 1, message: "取消点赞成功", jsonDic: nil)
         }else{
@@ -217,10 +217,10 @@ public class LiveRounts {
     
     
     // MARK: - 关注
-    static func handle_Live_follow(request: HTTPRequest, response: HTTPResponse)  {
+    static func handle_Mood_follow(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         let userID = request.param(name: "userID")!
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let fUserId = request.param(name: "fUserId") else {
@@ -239,56 +239,56 @@ public class LiveRounts {
         }
     }
     
-    // MARK: - 删除Live
-    static func handle_Live_delete(request: HTTPRequest, response: HTTPResponse)  {
+    // MARK: - 删除Mood
+    static func handle_Mood_delete(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
-        guard let liveID = request.param(name: "liveID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+        guard let moodID = request.param(name: "moodID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 moodID", jsonDic: nil)
             return
         }
 
         var dic = [String : String]()
-        let result = DataBaseManager().custom(sqlStr: "Call getLive('\(liveID)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getMood('\(moodID)')")
         result.mysqlResult?.forEachRow(callback: { (data) in
-            dic["livePhotosUrl"]    = data[2]
-            dic["liveVideoUrl"]     = data[5]
-            dic["liveVideoImageUrl"] = data[6]
+            dic["moodPhotosUrl"]    = data[2]
+            dic["moodVideoUrl"]     = data[5]
+            dic["moodVideoImageUrl"] = data[6]
         })
         if dic.count > 0 {
             //删除本地资源
-            LiveRounts.deletelocalRes(dic: dic)
+            MoodRounts.deletelocalRes(dic: dic)
         }
         
-        let _ = DataBaseManager().custom(sqlStr: "Call deleteLive('\(liveID)')")
+        let _ = DataBaseManager().custom(sqlStr: "Call deleteMood('\(moodID)')")
         Account.returnData(response: response, status: 1, message: "删除成功", jsonDic: nil)
         
     }
     
     
-    // MARK: - 获取Live评论
-    static func handle_Live_getLiveComment(request: HTTPRequest, response: HTTPResponse)  {
+    // MARK: - 获取Mood评论
+    static func handle_Mood_getMoodComment(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
-        guard let liveID = request.param(name: "liveID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+        guard let moodID = request.param(name: "moodID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 moodID", jsonDic: nil)
             return
         }
 
         var arr = [[String : String]]()
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveComment('\(liveID)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getMoodComment('\(moodID)')")
         result.mysqlResult?.forEachRow(callback: { (data) in
-            //id    liveID    content    type    toUserID    toUserName    cAddTime
+            //id    moodID    content    type    toUserID    toUserName    cAddTime
             var dic = [String : String]()
             dic["cId"]          = data[0]
             dic["cUserID"]      = data[1]
             dic["cUserName"]    = data[2]
-            dic["liveID"]       = data[3]
+            dic["moodID"]       = data[3]
             dic["content"]      = data[4]
             dic["type"]         = data[5]
             dic["toUserID"]     = data[6]
@@ -297,19 +297,19 @@ public class LiveRounts {
             dic["cImgUrl"]      = data[9]
             arr.append(dic)
         })
-        Account.returnData(response: response, status: 1, message: "获取Live评论成功", jsonDic: arr)
+        Account.returnData(response: response, status: 1, message: "获取Mood评论成功", jsonDic: arr)
     }
     
     
-    // MARK: - 发布Live评论
-    static func handle_Live_addLiveComment(request: HTTPRequest, response: HTTPResponse)  {
+    // MARK: - 发布Mood评论
+    static func handle_Mood_addMoodComment(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
         let userID = request.param(name: "userID")!
-        guard let liveID = request.param(name: "liveID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+        guard let moodID = request.param(name: "moodID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 moodID", jsonDic: nil)
             return
         }
         guard let content = request.param(name: "content") else {
@@ -323,22 +323,22 @@ public class LiveRounts {
         
         //评论 1   回复 2
         let _ = type == "1" ?
-            DataBaseManager().custom(sqlStr: "Call addLiveComment('\(liveID)','\(userID)','\(content)','\(type)','\("")','\("")')") :
-            DataBaseManager().custom(sqlStr: "Call addLiveComment('\(liveID)','\(userID)','\(content)','\(type)','\(request.param(name: "toUserID")!)','\(request.param(name: "toUserName")!)')")
+            DataBaseManager().custom(sqlStr: "Call addMoodComment('\(moodID)','\(userID)','\(content)','\(type)','\("")','\("")')") :
+            DataBaseManager().custom(sqlStr: "Call addMoodComment('\(moodID)','\(userID)','\(content)','\(type)','\(request.param(name: "toUserID")!)','\(request.param(name: "toUserName")!)')")
         Account.returnData(response: response, status: 1, message: "评论成功", jsonDic: nil)
     }
     
     //MARK: - 删除评论
-    static func handle_Live_deleteLiveComment(request: HTTPRequest, response: HTTPResponse) {
+    static func handle_Mood_deleteMoodComment(request: HTTPRequest, response: HTTPResponse) {
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if LiveRounts.cheakUser(request: request, response: response)  == false {
+        if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let cID = request.param(name: "commentID") else {
             Account.returnData(response: response, status: -1, message: "缺少 commentID", jsonDic: nil)
             return
         }
-        let result = DataBaseManager().custom(sqlStr: "Call deleteLiveComment('\(cID)')")
+        let result = DataBaseManager().custom(sqlStr: "Call deleteMoodComment('\(cID)')")
         if result.success {
             Account.returnData(response: response, status: 1, message: "成功", jsonDic: nil)
         }else{
@@ -347,29 +347,29 @@ public class LiveRounts {
     }
     
     
-    // MARK: - 获取单独的Live
-    static func handle_Live_getAlone(request: HTTPRequest, response: HTTPResponse)  {
+    // MARK: - 获取单独的Mood
+    static func handle_Mood_getAlone(request: HTTPRequest, response: HTTPResponse)  {
         response.setHeader( .contentType, value: "text/html")          //响应头
         
-        guard let liveID = request.param(name: "liveID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 liveID", jsonDic: nil)
+        guard let moodID = request.param(name: "moodID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 moodID", jsonDic: nil)
             return
         }
         
         var dic = [String : String]()
-        let result = DataBaseManager().custom(sqlStr: "Call getLive('\(liveID)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getMood('\(moodID)')")
         result.mysqlResult?.forEachRow(callback: { (row) in
-            dic["liveId"]           = row[0]
-            dic["liveContent"]      = row[1]
-            dic["livePhotosUrl"]    = row[2]
-            dic["liveAddTime"]      = row[3]
-            dic["liveUserId"]       = row[4]
-            dic["liveVideoUrl"]     = row[5]
-            dic["liveVideoImageUrl"] = row[6]
-            dic["liveUserName"]     = row[7]
-            dic["liveUserIcon"]     = row[8]
-            dic["liveCommentNum"]   = row[9]
-            dic["liveLikeNum"]      = row[10]
+            dic["moodId"]           = row[0]
+            dic["moodContent"]      = row[1]
+            dic["moodPhotosUrl"]    = row[2]
+            dic["moodAddTime"]      = row[3]
+            dic["moodUserId"]       = row[4]
+            dic["moodVideoUrl"]     = row[5]
+            dic["moodVideoImageUrl"] = row[6]
+            dic["moodUserName"]     = row[7]
+            dic["moodUserIcon"]     = row[8]
+            dic["moodCommentNum"]   = row[9]
+            dic["moodLikeNum"]      = row[10]
             dic["isMyLike"]         = row[11]
             dic["isFollowing"]      = row[12]
         })
@@ -377,20 +377,20 @@ public class LiveRounts {
     }
     
     // MARK: - 获取用户主页信息
-    class func handle_Live_getLiveUserInfo(request: HTTPRequest, response: HTTPResponse) {
+    class func handle_Mood_getMoodUserInfo(request: HTTPRequest, response: HTTPResponse) {
         guard let userID = request.param(name: "userID") else {
             Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
             return
         }
         var dic = [String : String]()
-        let result = DataBaseManager().custom(sqlStr: "Call getLiveUserInfo('\(userID)')")
+        let result = DataBaseManager().custom(sqlStr: "Call getMoodUserInfo('\(userID)')")
         result.mysqlResult?.forEachRow(callback: { (row) in
             dic["userId"]           = userID
             dic["userName"]         = row[0]
             dic["imgUrl"]           = row[1]
             dic["LikeCount"]        = row[2]
             dic["FollowCount"]     = row[3]
-            dic["LiveCount"]        = row[4]
+            dic["MoodCount"]        = row[4]
         })
         Account.returnData(response: response, status: 1, message: "成功", jsonDic: dic)
     }
@@ -398,12 +398,12 @@ public class LiveRounts {
     
     
     // MARK: -  保存头像
-    class func saveLiveRes(request:HTTPRequest,userId:String) -> String {
+    class func saveMoodRes(request:HTTPRequest,userId:String) -> String {
         // 通过操作fileUploads数组来掌握文件上传的情况
         // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
         if let uploads = request.postFileUploads, uploads.count > 0 {
             // 创建路径用于存储已上传文件
-            let fileDir = Dir(Dir.workingDir.path + "Live_File")
+            let fileDir = Dir(Dir.workingDir.path + "Mood_File")
             do {
                 try fileDir.create()
             } catch {
@@ -417,7 +417,7 @@ public class LiveRounts {
                     // 将文件转移走，如果目标位置已经有同名文件则进行覆盖操作。
                     let file = try thisFile.moveTo(path: fileDir.path + upload.fileName, overWrite: true)
                     if file.path.count > 0 {
-                        paths.append("liveRes/" + upload.fileName)
+                        paths.append("moodRes/" + upload.fileName)
                     }else{
                         return ""
                     }
@@ -433,25 +433,25 @@ public class LiveRounts {
     // MARK : - 删除本地资源文件
     class func deletelocalRes(dic:[String:String]) {
         //如果有图片  删除图片资源
-        if dic["livePhotosUrl"]!.count > 0  {
-            let pathArr : [String] = dic["livePhotosUrl"]!.components(separatedBy: ",")
+        if dic["moodPhotosUrl"]!.count > 0  {
+            let pathArr : [String] = dic["moodPhotosUrl"]!.components(separatedBy: ",")
             for str in pathArr {
                 let path = str.substring(from: String.Index.init(encodedOffset: 7))
-                let file = File.init(Dir.workingDir.path + "Live_File" + path)
+                let file = File.init(Dir.workingDir.path + "Mood_File" + path)
                 file.delete()
             }
         }
         
         //如果有视频  删除视频资源
-        if dic["liveVideoUrl"]!.count > 0  {
-            let path = dic["liveVideoUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
-            let file = File.init(Dir.workingDir.path + "Live_File" + path)
+        if dic["moodVideoUrl"]!.count > 0  {
+            let path = dic["moodVideoUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
+            let file = File.init(Dir.workingDir.path + "Mood_File" + path)
             file.delete()
         }
         //如果有视频默认图片  删除默认图片
-        if dic["liveVideoImageUrl"]!.count > 0  {
-            let path = dic["liveVideoImageUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
-            let file = File.init(Dir.workingDir.path + "Live_File" + path)
+        if dic["moodVideoImageUrl"]!.count > 0  {
+            let path = dic["moodVideoImageUrl"]!.substring(from: String.Index.init(encodedOffset: 7))
+            let file = File.init(Dir.workingDir.path + "Mood_File" + path)
             file.delete()
         }
     }

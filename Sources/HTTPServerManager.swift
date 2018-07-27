@@ -21,9 +21,9 @@ open class NetworkServerManager {
         userConfigure(routes: &routes)                          //注册路由
         server.addRoutes(routes)                            //路由添加进服务
         
-        var routes_Live = Routes.init(baseUri: "/liveApi")  //创建Live路由器
-        LiveRounts.configure(routes: &routes_Live)          //注册Live接口路由
-        server.addRoutes(routes_Live)                       //添加到服务
+        var routes_mood = Routes.init(baseUri: "/moodApi")  //创建Mood路由器
+        MoodRounts.configure(routes: &routes_mood)          //注册Mood接口路由
+        server.addRoutes(routes_mood)                       //添加到服务
         
         server.serverPort = port                            //端口
         server.documentRoot = root                          //根目录
