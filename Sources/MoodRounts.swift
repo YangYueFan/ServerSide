@@ -20,55 +20,75 @@ public class MoodRounts {
         
         // MARK: - 获取Mood
         routes.add(method: .post , uri: "/getMoodList") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_mood_GetMoodList(request: request, response: response)
         }
         
         
         // MARK: - 发布心情
         routes.add(method: .post, uri: "/issueHeart") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_mood_issueHeart(request: request, response: response)
         }
         
         
         // MARK: - 点赞
         routes.add(method: .post, uri: "/addLike") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_mood_AddLike(request: request, response: response)
         }
         
         
         // MARK: - 关注
         routes.add(method: .post, uri: "/followMoodUser") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_follow(request: request, response: response)
         }
         
         
         // MARK: - 获取单独心情
         routes.add(method: .post, uri: "/getMood") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_getAlone(request: request, response: response)
         }
         
         
         // MARK: - 获取评论
         routes.add(method: .post, uri: "/getMoodComment") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_getMoodComment(request: request, response: response)
         }
         
         // MARK: - 发布评论
         routes.add(method: .post, uri: "/addMoodComment") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_addMoodComment(request: request, response: response)
         }
         
         routes.add(method: .post, uri: "/deleteMoodComment") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_deleteMoodComment(request: request, response: response)
         }
         
         
         // MARK: - 删除心情
         routes.add(method: .post, uri: "/deleteMood") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_delete(request: request, response: response)
         }
         // MARK: - 获取用户主页信息
         routes.add(method: .post, uri: "/getMoodUserInfo") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             MoodRounts.handle_Mood_getMoodUserInfo(request: request, response: response)
         }
         
@@ -76,6 +96,8 @@ public class MoodRounts {
         
         // MARK: - 所有"/moodRes"开头的URL都映射到了物理路径
         routes.add(method: .get, uri: "/moodRes/**") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             
@@ -102,8 +124,6 @@ public class MoodRounts {
     
     // MARK: - 处理获取Mood列表
     static func handle_mood_GetMoodList(request : HTTPRequest ,response : HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
-        
         guard let userID = request.param(name: "userID") else {
             Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
             return
@@ -153,7 +173,7 @@ public class MoodRounts {
     
     // MARK: - 发布心情
     static func handle_mood_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
+        
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -193,7 +213,6 @@ public class MoodRounts {
     
     // MARK: -  处理点赞或取消点赞
     static func handle_mood_AddLike(request : HTTPRequest ,response : HTTPResponse) {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         let userID = request.param(name: "userID")!
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
@@ -218,7 +237,6 @@ public class MoodRounts {
     
     // MARK: - 关注
     static func handle_Mood_follow(request: HTTPRequest, response: HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         let userID = request.param(name: "userID")!
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
@@ -241,8 +259,6 @@ public class MoodRounts {
     
     // MARK: - 删除Mood
     static func handle_Mood_delete(request: HTTPRequest, response: HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
-        
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -271,7 +287,6 @@ public class MoodRounts {
     
     // MARK: - 获取Mood评论
     static func handle_Mood_getMoodComment(request: HTTPRequest, response: HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -303,7 +318,6 @@ public class MoodRounts {
     
     // MARK: - 发布Mood评论
     static func handle_Mood_addMoodComment(request: HTTPRequest, response: HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -330,7 +344,6 @@ public class MoodRounts {
     
     //MARK: - 删除评论
     static func handle_Mood_deleteMoodComment(request: HTTPRequest, response: HTTPResponse) {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         if MoodRounts.cheakUser(request: request, response: response)  == false {
             return;
         }
@@ -349,7 +362,6 @@ public class MoodRounts {
     
     // MARK: - 获取单独的Mood
     static func handle_Mood_getAlone(request: HTTPRequest, response: HTTPResponse)  {
-        response.setHeader( .contentType, value: "text/html")          //响应头
         
         guard let moodID = request.param(name: "moodID") else {
             Account.returnData(response: response, status: -1, message: "缺少 moodID", jsonDic: nil)
@@ -397,7 +409,7 @@ public class MoodRounts {
     
     
     
-    // MARK: -  保存头像
+    // MARK: -  保存图片
     class func saveMoodRes(request:HTTPRequest,userId:String) -> String {
         // 通过操作fileUploads数组来掌握文件上传的情况
         // 如果这个POST请求不是分段multi-part类型，则该数组内容为空
