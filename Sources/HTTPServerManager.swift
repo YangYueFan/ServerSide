@@ -24,19 +24,19 @@ open class NetworkServerManager {
         var routes_mood = Routes.init(baseUri: "/moodApi")  //创建Mood路由器
         MoodRounts.configure(routes: &routes_mood)          //注册Mood接口路由
         server.addRoutes(routes_mood)                       //添加到服务
+    
         
-        server.serverPort = port                            //端口
-        server.documentRoot = root                          //根目录
-        server.serverName = "mood"
-        server.setResponseFilters([(Filter404(), .high)])   //404过滤
-        
-        var routes_Chat = Routes.init(baseUri: "/chatApi")  //创建Mood路由器
-        MoodRounts.configure(routes: &routes_Chat)          //注册Mood接口路由
+        var routes_Chat = Routes.init(baseUri: "/chatApi")  //创建chat路由器
+        ChatRounts.configure(routes: &routes_Chat)          //注册chat接口路由
         server.addRoutes(routes_Chat)                       //添加到服务
         
+        
+        
+        
+        
+        
         server.serverPort = port                            //端口
         server.documentRoot = root                          //根目录
-        server.serverName = "chat"
         server.setResponseFilters([(Filter404(), .high)])   //404过滤
     
         

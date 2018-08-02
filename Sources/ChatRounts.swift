@@ -16,18 +16,32 @@ public class ChatRounts {
         
         // MARK: - 搜索
         routes.add(method: .post , uri: "/searchFriend") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             ChatRounts.handle_IM_searchFriend(request: request, response: response)
         }
         
         // MARK: - 添加好友
         routes.add(method: .post , uri: "/addFriend") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
             ChatRounts.handle_IM_addFriend(request: request, response: response)
+        }
+        
+        // MARK: - 好友列表
+        routes.add(method: .post , uri: "/friendList") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
+            ChatRounts.handle_IM_friendList(request: request, response: response)
         }
     }
     
     // MARK: - 搜索
     class func handle_IM_searchFriend(request : HTTPRequest, response : HTTPResponse){
-        response.setHeader( .contentType, value: "text/html")          //响应头
+        
+//        if MoodRounts.cheakUser(request: request, response: response)  == false {
+//            return;
+//        }
         guard let userID = request.param(name: "userID") else {
             Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
             return
@@ -55,9 +69,9 @@ public class ChatRounts {
             Account.returnData(response: response, status: -1, message: "没找到该用户", jsonDic: nil)
         }
     }
-    
+    // MARK: -  添加好友
     class func handle_IM_addFriend(request : HTTPRequest, response : HTTPResponse){
-        response.setHeader( .contentType, value: "text/html")          //响应头
+
         guard let userID = request.param(name: "userID") else {
             Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
             return
@@ -75,9 +89,27 @@ public class ChatRounts {
             temp = Int(row[0]!)!
         })
         Account.returnData(response: response, status: temp, message: temp == 1 ? "成功":"失败", jsonDic: nil)
+    }
+    
+    // MARK: - 好友列表
+    class func handle_IM_friendList (request : HTTPRequest, response : HTTPResponse){
+        guard let userID = request.param(name: "userID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
+            return
+        }
+        guard let friendID = request.param(name: "friendID") else {
+            Account.returnData(response: response, status: -1, message: "缺少 friendID", jsonDic: nil)
+            return
+        }
         
         
+        let result = DataBaseManager().custom(sqlStr: "Call addFriend('\(userID)','\(friendID)')")
+        var temp = 0
         
+        result.mysqlResult?.forEachRow(callback: { (row) in
+            temp = Int(row[0]!)!
+        })
+        Account.returnData(response: response, status: temp, message: temp == 1 ? "成功":"失败", jsonDic: nil)
     }
     
 }
