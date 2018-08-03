@@ -60,7 +60,8 @@ public class ChatRounts {
             dic["fImgUrl"]      = row[2]
             dic["fPhone"]       = row[3]
             dic["fSex"]         = row[4]
-            dic["fIsAdd"]       = row[5]
+            dic["fAge"]         = row[5]
+            dic["fIsAdd"]       = row[6]
             resultArray.append(dic)
         })
         if resultArray.count > 0 {
@@ -97,19 +98,20 @@ public class ChatRounts {
             Account.returnData(response: response, status: -1, message: "缺少 userID", jsonDic: nil)
             return
         }
-        guard let friendID = request.param(name: "friendID") else {
-            Account.returnData(response: response, status: -1, message: "缺少 friendID", jsonDic: nil)
-            return
-        }
-        
-        
-        let result = DataBaseManager().custom(sqlStr: "Call addFriend('\(userID)','\(friendID)')")
-        var temp = 0
-        
+
+        let result = DataBaseManager().custom(sqlStr: "Call friendList('\(userID)'")
+        var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
-            temp = Int(row[0]!)!
+            var dic = [String:String]()
+            dic["fUserID"]      = row[0]
+            dic["fName"]        = row[1]
+            dic["fImgUrl"]      = row[2]
+            dic["fPhone"]       = row[3]
+            dic["fSex"]         = row[4]
+            dic["fAge"]         = row[5]
+            resultArray.append(dic)
         })
-        Account.returnData(response: response, status: temp, message: temp == 1 ? "成功":"失败", jsonDic: nil)
+        Account.returnData(response: response, status: 1, message: "成功", jsonDic: resultArray)
     }
     
 }
