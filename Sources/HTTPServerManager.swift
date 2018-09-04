@@ -30,9 +30,10 @@ open class NetworkServerManager {
         ChatRounts.configure(routes: &routes_Chat)          //注册chat接口路由
         server.addRoutes(routes_Chat)                       //添加到服务
         
-        
-        
-        
+        var routes_Push = Routes.init(baseUri: "/pushApi")  //创建Push路由器
+        PushRoutes.configure(routes: &routes_Push)          //注册Push接口路由
+        server.addRoutes(routes_Push)                       //添加到服务
+
         
         
         server.serverPort = port                            //端口

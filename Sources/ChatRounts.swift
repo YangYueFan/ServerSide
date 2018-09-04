@@ -34,6 +34,15 @@ public class ChatRounts {
             response.setHeader(.connection, value: "Keep-alive")
             ChatRounts.handle_IM_friendList(request: request, response: response)
         }
+        
+        // MARK: - 扣分项
+        routes.add(method: .get, uri: "/routeList") { (request, response) in
+            response.setHeader( .contentType, value: "text/html")          //响应头
+            response.setHeader(.connection, value: "Keep-alive")
+            ChatRounts.handle_getDudectList(request: request, response: response)
+            
+        }
+        
     }
     
     // MARK: - 搜索
@@ -99,7 +108,7 @@ public class ChatRounts {
             return
         }
 
-        let result = DataBaseManager().custom(sqlStr: "Call friendList('\(userID)'")
+        let result = DataBaseManager().custom(sqlStr: "Call friendList('\(userID)')")
         var resultArray = [Dictionary<String, String>]()
         result.mysqlResult?.forEachRow(callback: { (row) in
             var dic = [String:String]()
@@ -112,6 +121,32 @@ public class ChatRounts {
             resultArray.append(dic)
         })
         Account.returnData(response: response, status: 1, message: "成功", jsonDic: resultArray)
+    }
+    
+    class func handle_getDudectList(request : HTTPRequest, response : HTTPResponse){
+        var list = [String:[Dictionary<String, String>]]()
+        let content = ["综合不及格",
+                       "综合扣10分",
+                       "上车准备",
+                       "起步",
+                       "直线行驶",
+                       "加减挡位",
+                       "变更车道",
+                       "靠边停车",
+                       "通过路口"]
+        
+        for index in 0...8 {
+            let result = DataBaseManager().custom(sqlStr: String.init(format: "SELECT text,score FROM RouteScore%d", index))
+            var resultArray = [Dictionary<String, String>]()
+            result.mysqlResult?.forEachRow(callback: { (row) in
+                var dic = [String:String]()
+                dic["text"]         = row[0]
+                dic["score"]        = row[1]
+                resultArray.append(dic)
+            })
+            list[content[index]] = resultArray
+        }
+         Account.returnData(response: response, status: 1, message: "成功", jsonDic: list)
     }
     
 }
