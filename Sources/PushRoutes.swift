@@ -19,7 +19,7 @@ class NotificationsExample {
             response.status = .badRequest
             return response.completed()
         }
-        print("Adding device id:\(deviceId)")
+        debugPrint("Adding device id:\(deviceId)")
         if !deviceIds.contains(deviceId) {
             deviceIds.append(deviceId)
         }
@@ -31,7 +31,7 @@ class NotificationsExample {
     }
     
     func notifyDevices(request: HTTPRequest, response: HTTPResponse) {
-        print("Sending notification to all devices: \(deviceIds)")
+        debugPrint("Sending notification to all devices: \(deviceIds)")
         NotificationPusher(apnsTopic: notificationsTestId)
             .pushAPNS(configurationName: notificationsTestId,
                       deviceTokens: deviceIds,
@@ -39,7 +39,7 @@ class NotificationsExample {
                         .alertBody("Hello!"),
                         .sound("default")]) {
                             responses in
-                            print("\(responses)")
+                            debugPrint("\(responses)")
                             response.completed()
         }
     }

@@ -33,6 +33,27 @@ open class NetworkServerManager {
         var routes_Push = Routes.init(baseUri: "/pushApi")  //创建Push路由器
         PushRoutes.configure(routes: &routes_Push)          //注册Push接口路由
         server.addRoutes(routes_Push)                       //添加到服务
+        
+        var routes_One = Routes.init(baseUri: "/oneApi")  //创建Push路由器
+        OneRounts.configure(routes: &routes_One)          //注册Push接口路由
+        server.addRoutes(routes_One)                       //添加到服务
+        
+        
+        
+//        var routes_Crawler = Routes.init(baseUri: "/pc")  //创建Push路由器
+//        routes_Crawler.add(uri: "/data") { (request, response) in
+//            //在请求中创建并开始爬一次
+//            let pc = KCrawler.init(url: "https://m.douban.com/movie/nowintheater?loc_id=108288")
+//            // 开始爬虫
+//            pc.start()
+//            //如果有爬到数据，就添加到Response中返回
+//            response.setHeader(.contentType, value: "text/html;charset=UTF-8")
+//            response.appendBody(string: pc.results.count > 0 ? pc.results : "")
+//            response.completed()
+//        }
+//        server.addRoutes(routes_Crawler)                       //添加到服务
+        
+        
 
         
         
@@ -85,7 +106,6 @@ open class NetworkServerManager {
             let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "IMG_Files").path)
             // 用我们的根目录和路径
             // 修改集触发请求的句柄
-            
             handler.handleRequest(request: request, response: response)
         }
         //*********************************************************************
