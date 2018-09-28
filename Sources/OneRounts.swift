@@ -37,13 +37,13 @@ public class OneRounts {
             return
         }
         
+        var dic = [String:String]()
         let result = DataBaseManager().custom(sqlStr: "Call changeOneLike('\(userID)','\(oneID)')")
-        if result.success {
-            Account.returnData(response: response, status: 1, message: "成功", jsonDic: nil)
-        }else{
-            Account.returnData(response: response, status: -1, message: "失败", jsonDic: nil)
-        }
-        
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            dic["isMyLike"] = data[0]
+            dic["likeNum"] = data[1]
+        })
+        Account.returnData(response: response, status: 1, message: "成功", jsonDic: dic)
     }
     
     
