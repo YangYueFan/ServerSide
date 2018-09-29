@@ -95,6 +95,7 @@ public class OneRounts {
             dic["userID"] = data[2]
             dic["commentText"] = data[3]
             dic["iconUrl"] = data[5]
+            dic["name"] = data[6]
             commentArr.append(dic)
         })
         var dataDic = [String:Any]()
