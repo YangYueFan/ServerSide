@@ -3,4 +3,4 @@
 /Packages
 /*.xcodeproj
 /*.p8
-/Sources/KCrawler.*
+/*/KCrawler.swift
