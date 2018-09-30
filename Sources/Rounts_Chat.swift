@@ -9,7 +9,7 @@ import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
 
-public class ChatRounts {
+public class Rounts_Chat {
     
     class public func  configure(routes: inout Routes) {
         // 添加接口,请求方式,路径
@@ -18,28 +18,28 @@ public class ChatRounts {
         routes.add(method: .post , uri: "/searchFriend") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            ChatRounts.handle_IM_searchFriend(request: request, response: response)
+            Rounts_Chat.handle_IM_searchFriend(request: request, response: response)
         }
         
         // MARK: - 添加好友
         routes.add(method: .post , uri: "/addFriend") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            ChatRounts.handle_IM_addFriend(request: request, response: response)
+            Rounts_Chat.handle_IM_addFriend(request: request, response: response)
         }
         
         // MARK: - 好友列表
         routes.add(method: .post , uri: "/friendList") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            ChatRounts.handle_IM_friendList(request: request, response: response)
+            Rounts_Chat.handle_IM_friendList(request: request, response: response)
         }
         
         // MARK: - 扣分项
         routes.add(method: .get, uri: "/routeList") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            ChatRounts.handle_getDudectList(request: request, response: response)
+            Rounts_Chat.handle_getDudectList(request: request, response: response)
             
         }
         

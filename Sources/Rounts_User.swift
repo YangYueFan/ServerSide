@@ -9,7 +9,7 @@ import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
 
-public class UserRoutes {
+public class Rounts_User {
     
     //MARK: - 注册路由
     class public func configure(routes: inout Routes) {
@@ -46,9 +46,6 @@ public class UserRoutes {
             Account.handle_User_ChangeInfo(request: request, response: response)
             
         }
-        
-        
-        
         //*********************************************************************
         // MARK: - 上传头像
         routes.add(method: .post, uri: "/uploadIcon") { (request, response) in

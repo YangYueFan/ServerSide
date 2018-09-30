@@ -8,7 +8,7 @@ import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
 
-public class MoodRounts {
+public class Rounts_Mood {
     
     static let table_Mood           = "Mood"
     static let table_MoodComment    = "MoodComment"
@@ -22,7 +22,7 @@ public class MoodRounts {
         routes.add(method: .post , uri: "/getMoodList") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_mood_GetMoodList(request: request, response: response)
+            Rounts_Mood.handle_mood_GetMoodList(request: request, response: response)
         }
         
         
@@ -30,7 +30,7 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/issueHeart") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_mood_issueHeart(request: request, response: response)
+            Rounts_Mood.handle_mood_issueHeart(request: request, response: response)
         }
         
         
@@ -38,7 +38,7 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/addLike") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_mood_AddLike(request: request, response: response)
+            Rounts_Mood.handle_mood_AddLike(request: request, response: response)
         }
         
         
@@ -46,7 +46,7 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/followMoodUser") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_follow(request: request, response: response)
+            Rounts_Mood.handle_Mood_follow(request: request, response: response)
         }
         
         
@@ -54,7 +54,7 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/getMood") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_getAlone(request: request, response: response)
+            Rounts_Mood.handle_Mood_getAlone(request: request, response: response)
         }
         
         
@@ -62,20 +62,20 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/getMoodComment") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_getMoodComment(request: request, response: response)
+            Rounts_Mood.handle_Mood_getMoodComment(request: request, response: response)
         }
         
         // MARK: - 发布评论
         routes.add(method: .post, uri: "/addMoodComment") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_addMoodComment(request: request, response: response)
+            Rounts_Mood.handle_Mood_addMoodComment(request: request, response: response)
         }
         
         routes.add(method: .post, uri: "/deleteMoodComment") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_deleteMoodComment(request: request, response: response)
+            Rounts_Mood.handle_Mood_deleteMoodComment(request: request, response: response)
         }
         
         
@@ -83,32 +83,32 @@ public class MoodRounts {
         routes.add(method: .post, uri: "/deleteMood") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_delete(request: request, response: response)
+            Rounts_Mood.handle_Mood_delete(request: request, response: response)
         }
         // MARK: - 获取用户主页信息
         routes.add(method: .post, uri: "/getMoodUserInfo") { (request, response) in
             response.setHeader( .contentType, value: "text/html")          //响应头
             response.setHeader(.connection, value: "Keep-alive")
-            MoodRounts.handle_Mood_getMoodUserInfo(request: request, response: response)
+            Rounts_Mood.handle_Mood_getMoodUserInfo(request: request, response: response)
         }
         
         
         
         // MARK: - 所有"/moodRes"开头的URL都映射到了物理路径
-        routes.add(method: .get, uri: "/moodRes/**") { (request, response) in
-            response.setHeader( .contentType, value: "text/html")          //响应头
-            response.setHeader(.connection, value: "Keep-alive")
-            // 获得符合通配符的请求路径
-            request.path = request.urlVariables[routeTrailingWildcardKey]!
-            
-            // 用文档根目录初始化静态文件句柄
-            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Mood_File").path)
-            // 用我们的根目录和路径
-            // 修改集触发请求的句柄
-            
-            handler.handleRequest(request: request, response: response)
-        }
-        routes.add(method: .post, uri: "/moodRes/**") { (request, response) in
+//        routes.add(method: .get, uri: "/moodRes/**") { (request, response) in
+//            response.setHeader( .contentType, value: "text/html")          //响应头
+//            response.setHeader(.connection, value: "Keep-alive")
+//            // 获得符合通配符的请求路径
+//            request.path = request.urlVariables[routeTrailingWildcardKey]!
+//            
+//            // 用文档根目录初始化静态文件句柄
+//            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "Mood_File").path)
+//            // 用我们的根目录和路径
+//            // 修改集触发请求的句柄
+//            
+//            handler.handleRequest(request: request, response: response)
+//        }
+        routes.add( uri: "/moodRes/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             
@@ -174,7 +174,7 @@ public class MoodRounts {
     // MARK: - 发布心情
     static func handle_mood_issueHeart(request : HTTPRequest ,response : HTTPResponse)  {
         
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let content = request.param(name: "content") else {
@@ -195,7 +195,7 @@ public class MoodRounts {
             }
         }else if type == "2"{
             //保存图片、视频资源
-            let path = MoodRounts.saveMoodRes(request: request,userId: userID)
+            let path = Rounts_Mood.saveMoodRes(request: request,userId: userID)
             if path == "" {
                 Account.returnData(response: response, status: -1, message: "上传失败", jsonDic: nil)
                 return
@@ -214,7 +214,7 @@ public class MoodRounts {
     // MARK: -  处理点赞或取消点赞
     static func handle_mood_AddLike(request : HTTPRequest ,response : HTTPResponse) {
         let userID = request.param(name: "userID")!
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let moodId = request.param(name: "moodId") else {
@@ -238,7 +238,7 @@ public class MoodRounts {
     // MARK: - 关注
     static func handle_Mood_follow(request: HTTPRequest, response: HTTPResponse)  {
         let userID = request.param(name: "userID")!
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let fUserId = request.param(name: "fUserId") else {
@@ -259,7 +259,7 @@ public class MoodRounts {
     
     // MARK: - 删除Mood
     static func handle_Mood_delete(request: HTTPRequest, response: HTTPResponse)  {
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let moodID = request.param(name: "moodID") else {
@@ -276,7 +276,7 @@ public class MoodRounts {
         })
         if dic.count > 0 {
             //删除本地资源
-            MoodRounts.deletelocalRes(dic: dic)
+            Rounts_Mood.deletelocalRes(dic: dic)
         }
         
         let _ = DataBaseManager().custom(sqlStr: "Call deleteMood('\(moodID)')")
@@ -287,7 +287,7 @@ public class MoodRounts {
     
     // MARK: - 获取Mood评论
     static func handle_Mood_getMoodComment(request: HTTPRequest, response: HTTPResponse)  {
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let moodID = request.param(name: "moodID") else {
@@ -318,7 +318,7 @@ public class MoodRounts {
     
     // MARK: - 发布Mood评论
     static func handle_Mood_addMoodComment(request: HTTPRequest, response: HTTPResponse)  {
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         let userID = request.param(name: "userID")!
@@ -344,7 +344,7 @@ public class MoodRounts {
     
     //MARK: - 删除评论
     static func handle_Mood_deleteMoodComment(request: HTTPRequest, response: HTTPResponse) {
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let cID = request.param(name: "commentID") else {

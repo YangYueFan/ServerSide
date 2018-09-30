@@ -267,7 +267,7 @@ open class Account{
     
     static func handle_User_ChangeInfo (request : HTTPRequest ,response : HTTPResponse){
         response.setHeader( .contentType, value: "text/html")          //响应头
-        if MoodRounts.cheakUser(request: request, response: response)  == false {
+        if Rounts_Mood.cheakUser(request: request, response: response)  == false {
             return;
         }
         guard let nickname = request.param(name: "nickname") else {

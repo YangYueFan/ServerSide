@@ -17,25 +17,25 @@ open class NetworkServerManager {
         server = HTTPServer.init()                          //创建HTTPServer服务器
         
         var routes = Routes.init(baseUri: "/api")           //创建路由器
-        UserRoutes.configure(routes: &routes)               //注册用户信息接口路由
+        Rounts_User.configure(routes: &routes)               //注册用户信息接口路由
         userConfigure(routes: &routes)                          //注册路由
         server.addRoutes(routes)                            //路由添加进服务
         
         var routes_mood = Routes.init(baseUri: "/moodApi")  //创建Mood路由器
-        MoodRounts.configure(routes: &routes_mood)          //注册Mood接口路由
+        Rounts_Mood.configure(routes: &routes_mood)          //注册Mood接口路由
         server.addRoutes(routes_mood)                       //添加到服务
     
         
         var routes_Chat = Routes.init(baseUri: "/chatApi")  //创建chat路由器
-        ChatRounts.configure(routes: &routes_Chat)          //注册chat接口路由
+        Rounts_Chat.configure(routes: &routes_Chat)          //注册chat接口路由
         server.addRoutes(routes_Chat)                       //添加到服务
         
         var routes_Push = Routes.init(baseUri: "/pushApi")  //创建Push路由器
-        PushRoutes.configure(routes: &routes_Push)          //注册Push接口路由
+        Rounts_Push.configure(routes: &routes_Push)          //注册Push接口路由
         server.addRoutes(routes_Push)                       //添加到服务
         
         var routes_One = Routes.init(baseUri: "/oneApi")  //创建Push路由器
-        OneRounts.configure(routes: &routes_One)          //注册Push接口路由
+        Rounts_One.configure(routes: &routes_One)          //注册Push接口路由
         server.addRoutes(routes_One)                       //添加到服务
         
         
@@ -85,7 +85,7 @@ open class NetworkServerManager {
 
         //*********************************************************************
         //所有"/res"开头的URL都映射到了物理路径  
-        routes.add(method: .get, uri: "/res/**") { (request, response) in
+        routes.add( uri: "/res/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             
@@ -96,20 +96,9 @@ open class NetworkServerManager {
 
             handler.handleRequest(request: request, response: response)
         }
-        
-        //所有"/res"开头的URL都映射到了物理路径
-        routes.add(method: .post, uri: "/res/**") { (request, response) in
-            // 获得符合通配符的请求路径
-            request.path = request.urlVariables[routeTrailingWildcardKey]!
-            
-            // 用文档根目录初始化静态文件句柄
-            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "IMG_Files").path)
-            // 用我们的根目录和路径
-            // 修改集触发请求的句柄
-            handler.handleRequest(request: request, response: response)
-        }
+
         //*********************************************************************
-        routes.add(method: .get, uri: "/file/**") { (request, response) in
+        routes.add( uri: "/file/**") { (request, response) in
             // 获得符合通配符的请求路径
             request.path = request.urlVariables[routeTrailingWildcardKey]!
             print(Dir(Dir.workingDir.path + "file/HTML").path)
@@ -119,25 +108,14 @@ open class NetworkServerManager {
             // 修改集触发请求的句柄
             handler.handleRequest(request: request, response: response)
         }
-        routes.add(method: .post, uri: "/file/**") { (request, response) in
-            // 获得符合通配符的请求路径
-            request.path = request.urlVariables[routeTrailingWildcardKey]!
-            print(Dir(Dir.workingDir.path + "file/HTML").path)
-            // 用文档根目录初始化静态文件句柄
-            let handler = StaticFileHandler(documentRoot: Dir(Dir.workingDir.path + "file/HTML").path)
-            // 用我们的根目录和路径
-            // 修改集触发请求的句柄
-            handler.handleRequest(request: request, response: response)
-        }
+
         
         
         //*********************************************************************
-        routes.add(method: .post, uri: "/getHomeData") { (request, response) in
+        routes.add(uri: "/getHomeData") { (request, response) in
             Account.handle_Get_Items(request: request, response: response)
         }
-        routes.add(method: .get, uri: "/getHomeData") { (request, response) in
-            Account.handle_Get_Items(request: request, response: response)
-        }
+
     }
     
     //MARK: 通用响应格式

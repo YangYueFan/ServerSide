@@ -8,20 +8,20 @@ import PerfectLib
 import PerfectHTTP
 import PerfectHTTPServer
 
-public class OneRounts {
+public class Rounts_One {
     
     //MARK: 注册路由
     class public func configure(routes: inout Routes) {
         routes.add(uri: "/OneLike") { (request, response) in
-            OneRounts.handle_One_Like(request: request, response: response)
+            Rounts_One.handle_One_Like(request: request, response: response)
         }
         
         routes.add(uri: "/addOneComment") { (request, response) in
-            OneRounts.handle_One_addComment(request: request, response: response)
+            Rounts_One.handle_One_addComment(request: request, response: response)
         }
         
         routes.add(uri: "/getOneData") { (request, response) in
-            OneRounts.handle_One_getData(request: request, response: response)
+            Rounts_One.handle_One_getData(request: request, response: response)
         }
     }
     
