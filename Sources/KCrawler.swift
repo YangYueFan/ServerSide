@@ -76,7 +76,7 @@ class KCrawler {
             debugPrint("获取信息结束")
             
             results = results.replace(of: ",", with: "")
-            results = results.characters.count > 0 ? "{\(results)}" : ""
+            results = results.count > 0 ? "{\(results)}" : ""
             
         }else{
             throw crawlerError(msg:"查询URL初始化失败")
