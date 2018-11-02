@@ -29,7 +29,7 @@ import PerfectNotifications
 let notificationsTestId = "com.Ken.MyClient"                        // 应用程序名称，我们用这个名称来配置，但是不一定非得是这个形式
 let apnsTeamIdentifier = "TRZRC745Z4"                               //团队编号
 let apnsKeyIdentifier = "9Q98PA88U2"                                //授权码
-let apnsPrivateKey = "ServerSide/AuthKey_9Q98PA88U2.p8"             //私有钥匙文件
+let apnsPrivateKey = "/Users/kejibuios/Desktop/Project/ServerSide/AuthKey_9Q98PA88U2.p8"          //私有钥匙文件
 
 //配置
 NotificationPusher.addConfigurationAPNS(name: notificationsTestId,

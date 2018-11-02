@@ -86,13 +86,19 @@ class NotificationsExample {
             Account.returnData(response: response, status: -1, message: "缺少 deviceIds 参数", jsonDic: nil)
             return
         }
+        var notifBody = "Hello!"
+        let title = request.param(name: "title")
+        if  title != nil {
+            notifBody = title!
+        }
+        
         debugPrint("Sending notification to all devices: \(deviceIds)")
         let arr = deviceIds.components(separatedBy: ",")
     
         NotificationPusher(apnsTopic: notificationsTestId)
             .pushAPNS(configurationName: notificationsTestId,
                       deviceTokens: arr,
-                      notificationItems: [.alertBody("Hello!"),.sound("default")]) {
+                      notificationItems: [.alertBody(notifBody),.sound("default")]) {
                             responses in
                             debugPrint("\(responses)")
                             response.completed()
