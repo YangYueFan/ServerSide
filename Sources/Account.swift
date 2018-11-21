@@ -224,9 +224,39 @@ open class Account{
         }else{
             self.returnData(response: response, status: -1, message: "提交失败", jsonDic: nil)
         }
+    }
+    // MARK: - 修改用户密码
+    static func handle_User_Info (request : HTTPRequest ,response : HTTPResponse){
+        response.setHeader( .contentType, value: "text/html")          //响应头
         
+        var jsonDic = [String:Any]()
+        guard let userAccount = request.param(name: "userAccount") else {
+            self.returnData(response: response, status: -1, message: "缺少 userAccount", jsonDic: nil)
+            return
+        }
+        let result = DataBaseManager().custom(sqlStr: "Call getUserInfo('\(userAccount)')")
+        
+        result.mysqlResult?.forEachRow(callback: { (data) in
+            print(data)
+            if data.count > 1 {
+                jsonDic["Age"]           = data[0]
+//                jsonDic["UserID"]       = data[1]
+                jsonDic["title"]         = data[2]
+                jsonDic["avatarURLPath"] = data[3]
+//                jsonDic["ClassType"]    = data[4]
+                jsonDic["Sex"]           = data[5]
+                jsonDic["Age"]           = data[6]
+//                jsonDic["apiToken"]     = data[7]
+//                jsonDic["email"]        = data[9]
+            }
+        })
+        
+        self.returnData(response: response, status: 0, message: "提交成功", jsonDic: jsonDic)
+        return
         
     }
+    
+    
     
     
     // MARK: - 修改用户密码

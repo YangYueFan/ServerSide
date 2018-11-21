@@ -51,6 +51,13 @@ public class Rounts_User {
         routes.add(method: .post, uri: "/uploadIcon") { (request, response) in
             Account.handle_User_UploadIcon(request: request, response: response)
         }
+        
+        //*********************************************************************
+        // MARK: - 上传头像
+        routes.add(uri: "/getUserInfo") { (request, response) in
+            Account.handle_User_Info(request: request, response: response)
+        }
+        
     }
     
 }

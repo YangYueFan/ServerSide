@@ -70,8 +70,6 @@ class NotificationsExample {
             })
              Account.returnData(response: response, status: 0, message: "成功", jsonDic: arr)
         }
-        
-        
     }
     
     
