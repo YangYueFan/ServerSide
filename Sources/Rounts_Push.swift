@@ -103,7 +103,8 @@ class NotificationsExample {
                                           .sound("default"),
                                           .mutableContent,
                                           .badge(1),
-                                          .alertLaunchImage(url == nil ? "" : url! )])
+                                          .alertLaunchImage(url == nil ? "" : url! ),
+                                          .category("myNotificationCategory")])
             { (responses) in
                 debugPrint("\(responses)")
                 response.completed()
