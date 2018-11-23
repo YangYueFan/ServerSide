@@ -96,7 +96,7 @@ class NotificationsExample {
         var url = request.param(name: "url")
         if url != nil {
             if url!.hasPrefix("http") == false {
-                url = "http://47.100.98.169:8888/api/moodRes/" + url!
+                url = "http://47.100.98.169:8888/moodApi/moodRes/" + url!
             }
         }
             
