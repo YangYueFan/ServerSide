@@ -127,15 +127,13 @@ public class Rounts_Push {
     class public func configure(routes: inout Routes) {
         
 
-        routes.add(method: .get, uri: "/add") { (request, response) in
+        routes.add(uri: "/add") { (request, response) in
             Rounts_Push.handle_add(request: request, response: response)
         }
-        
-        routes.add(method: .get, uri: "/notify") { (request, response) in
+        routes.add(uri: "/notify") { (request, response) in
             Rounts_Push.handle_Push(request: request, response: response)
         }
-        
-        routes.add(method: .get, uri: "/list") { (request, response) in
+        routes.add(uri: "/list") { (request, response) in
             Rounts_Push.handle_list(request: request, response: response)
         }
         
