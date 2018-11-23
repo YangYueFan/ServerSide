@@ -93,8 +93,12 @@ class NotificationsExample {
         debugPrint("Sending notification to all devices: \(deviceIds)")
         let arr = deviceIds.components(separatedBy: ",")
         
-        let url = request.param(name: "url")
-        
+        var url = request.param(name: "url")
+        if url != nil {
+            if url!.hasPrefix("http") == false {
+                url = "http://47.100.98.169:8888/api/res/" + url!
+            }
+        }
             
         NotificationPusher(apnsTopic: notificationsTestId)
             .pushAPNS(configurationName: notificationsTestId,
