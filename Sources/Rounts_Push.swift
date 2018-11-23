@@ -92,15 +92,25 @@ class NotificationsExample {
         
         debugPrint("Sending notification to all devices: \(deviceIds)")
         let arr = deviceIds.components(separatedBy: ",")
-    
+        
+        let url = request.param(name: "url")
+        
+            
         NotificationPusher(apnsTopic: notificationsTestId)
             .pushAPNS(configurationName: notificationsTestId,
                       deviceTokens: arr,
-                      notificationItems: [.alertBody(notifBody),.sound("default")]) {
-                            responses in
-                            debugPrint("\(responses)")
-                            response.completed()
+                      notificationItems: [.alertBody(notifBody),
+                                          .sound("default"),
+                                          .mutableContent,
+                                          .badge(1),
+                                          .alertLaunchImage(url == nil ? "" : url! )])
+            { (responses) in
+                debugPrint("\(responses)")
+                response.completed()
         }
+        
+        
+        
     }
 }
 
